@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Etusivu",
+    "products": "Tuotteet",
+    "about": "Meistä",
+    "contact": "Ota yhteyttä",
+    "catalog": "Luettelo"
+  },
+  "hero": {
+    "title": "Ammattimaiset LED-kasvatusvalot & Energiansäästöratkaisut",
+    "subtitle": "Laadukkaita, tehokkaita valaistusratkaisuja kaupallisiin kasvihuoneisiin, sisäviljelyyn ja teollisuuskäyttöön.",
+    "cta": "Tutustu tuotteisiin",
+    "learnMore": "Lue lisää"
+  },
+  "categories": {
+    "title": "Tuotteemme",
+    "plant": {
+      "title": "LED-kasvatusvalot",
+      "desc": "Täyden spektrin LED-kasvatusvalot, jotka on suunniteltu optimaaliseen kasvuun taimesta satoon."
+    },
+    "energy": {
+      "title": "Energiansäästövalot",
+      "desc": "Tehokkaat LED-valaistusratkaisut, jotka vähentävät energiankulutusta jopa 80% säilyttäen samalla erinomaisen kirkkauden."
+    }
+  },
+  "features": {
+    "title": "Miksi valita meidän valomme",
+    "items": [
+      {
+        "title": "Energiatehokas",
+        "desc": "Säästä jopa 80% sähkökustannuksissa verrattuna perinteisiin valaistusratkaisuihin."
+      },
+      {
+        "title": "Täysi spektri",
+        "desc": "Optimoitu spektri kasvien kaikkiin kasvuvaiheisiin taimesta kukintaan."
+      },
+      {
+        "title": "Pitkä käyttöikä",
+        "desc": "Kestävä rakenne, yli 50 000 tuntia luotettavaa toimintaa."
+      },
+      {
+        "title": "Ympäristöystävällinen",
+        "desc": "RoHS-yhteensopiva, elohopeaton ja täysin kierrätettävät materiaalit."
+      }
+    ]
+  },
+  "featured": {
+    "title": "Suositellut tuotteet",
+    "viewAll": "Näytä kaikki tuotteet"
+  },
+  "about": {
+    "title": "Meistä",
+    "subtitle": "LED-valaistusratkaisujen johtava valmistaja",
+    "desc1": "Yli 15 vuoden kokemuksella LED-valaistuksen valmistuksessa tarjoamme innovatiivisia, energiatehokkaita valaistusratkaisuja maailmanlaajuisille asiakkaille.",
+    "desc2": "Tuotteemme palvelevat laajaa käyttökohdevalikoimaa, mukaan lukien kaupalliset kasvihuoneet, sisäviljelmät, teollisuusvarastot ja liiketilat. Olemme ylpeitä tiukasta laadunvalvonnastamme ja jatkuvasta T&K-panostuksestamme.",
+    "values": {
+      "title": "Arvomme",
+      "quality": {
+        "title": "Laatu ensin",
+        "desc": "Jokainen tuote testataan tarkasti ennen toimitusta."
+      },
+      "innovation": {
+        "title": "Innovaatio",
+        "desc": "Jatkuva T&K tuodakseen sinulle uusimman LED-teknologian."
+      },
+      "service": {
+        "title": "Asiakaspalvelu",
+        "desc": "Ammattitaitoinen tukitiimi valmiina auttamaan sinua milloin tahansa."
+      }
+    },
+    "contact": {
+      "title": "Ota yhteyttä",
+      "desc": "Onko kysyttävää tuotteistamme? Olemme täällä auttamassa!"
+    }
+  },
+  "products": {
+    "title": "Tuotteemme",
+    "all": "Kaikki",
+    "plant": "Kasvatusvalot",
+    "energy": "Energiansäästö",
+    "viewDetail": "Katso tiedot",
+    "inquire": "Lähetä kysely",
+    "relatedProducts": "Samanlaiset tuotteet",
+    "specs": "Tekniset tiedot",
+    "description": "Kuvaus",
+    "features": "Ominaisuudet"
+  },
+  "chat": {
+    "button": "Kysely",
+    "title": "Lähetä meille kysely",
+    "name": "Nimesi",
+    "namePlaceholder": "Matti Meikäläinen",
+    "email": "Sähköpostiosoite",
+    "emailPlaceholder": "matti@example.com",
+    "company": "Yritys (valinnainen)",
+    "companyPlaceholder": "Yritys Oy",
+    "product": "Kiinnostava tuote",
+    "selectProduct": "Valitse tuote",
+    "message": "Viesti",
+    "messagePlaceholder": "Kerro meille vaatimuksistasi...",
+    "submit": "Lähetä kysely",
+    "sending": "Lähetetään...",
+    "success": "Kiitos! Kyselysi on lähetetty onnistuneesti. Otamme sinuun yhteyttä 24 tunnin kuluessa.",
+    "error": "Jotain meni pieleen. Yritä myöhemmin uudelleen.",
+    "close": "Sulje"
+  },
+  "footer": {
+    "rights": "Kaikki oikeudet pidätetään.",
+    "products": "Tuotteet",
+    "company": "Yritys",
+    "contact": "Yhteystiedot",
+    "email": "Sähköposti",
+    "phone": "Puhelin"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "products": "Productos",
+    "about": "Sobre Nosotros",
+    "contact": "Contacto",
+    "catalog": "Catálogo"
+  },
+  "hero": {
+    "title": "Luces LED Profesionales para Cultivo y Soluciones de Ahorro Energético",
+    "subtitle": "Soluciones de iluminación de alta calidad y eficientes para invernaderos comerciales, cultivos de interior y aplicaciones industriales.",
+    "cta": "Explorar Productos",
+    "learnMore": "Más Información"
+  },
+  "categories": {
+    "title": "Nuestros Productos",
+    "plant": {
+      "title": "Luces LED para Cultivo",
+      "desc": "Luces LED de espectro completo diseñadas para un crecimiento óptimo de las plantas en cada etapa, desde plántula hasta cosecha."
+    },
+    "energy": {
+      "title": "Luces de Ahorro Energético",
+      "desc": "Soluciones de iluminación LED de alta eficiencia que reducen el consumo de energía hasta un 80% manteniendo un brillo superior."
+    }
+  },
+  "features": {
+    "title": "Por Qué Elegir Nuestras Luces",
+    "items": [
+      {
+        "title": "Eficiencia Energética",
+        "desc": "Ahorre hasta un 80% en costos de electricidad en comparación con soluciones de iluminación tradicionales."
+      },
+      {
+        "title": "Espectro Completo",
+        "desc": "Espectro optimizado para todas las etapas de crecimiento de las plantas, desde plántula hasta floración."
+      },
+      {
+        "title": "Larga Vida Útil",
+        "desc": "Diseño duradero con más de 50.000 horas de funcionamiento confiable."
+      },
+      {
+        "title": "Ecológico",
+        "desc": "Cumple con RoHS, libre de mercurio y materiales totalmente reciclables."
+      }
+    ]
+  },
+  "featured": {
+    "title": "Productos Destacados",
+    "viewAll": "Ver Todos los Productos"
+  },
+  "about": {
+    "title": "Sobre Nosotros",
+    "subtitle": "Fabricante Líder de Soluciones de Iluminación LED",
+    "desc1": "Con más de 15 años de experiencia en la fabricación de iluminación LED, nos dedicamos a proporcionar soluciones de iluminación innovadoras y energéticamente eficientes para clientes globales.",
+    "desc2": "Nuestros productos sirven una amplia gama de aplicaciones, incluidos invernaderos comerciales, granjas de interior, almacenes industriales y espacios comerciales. Nos enorgullecemos del riguroso control de calidad y la inversión continua en I+D.",
+    "values": {
+      "title": "Nuestros Valores",
+      "quality": {
+        "title": "Calidad Primero",
+        "desc": "Cada producto se somete a pruebas estrictas antes del envío."
+      },
+      "innovation": {
+        "title": "Innovación",
+        "desc": "I+D continua para ofrecerle la última tecnología LED."
+      },
+      "service": {
+        "title": "Servicio al Cliente",
+        "desc": "Equipo de soporte profesional listo para ayudarle en cualquier momento."
+      }
+    },
+    "contact": {
+      "title": "Póngase en Contacto",
+      "desc": "¿Tiene preguntas sobre nuestros productos? ¡Estamos aquí para ayudar!"
+    }
+  },
+  "products": {
+    "title": "Nuestros Productos",
+    "all": "Todos",
+    "plant": "Luces para Cultivo",
+    "energy": "Ahorro Energético",
+    "viewDetail": "Ver Detalles",
+    "inquire": "Enviar Consulta",
+    "relatedProducts": "Productos Relacionados",
+    "specs": "Especificaciones",
+    "description": "Descripción",
+    "features": "Características"
+  },
+  "chat": {
+    "button": "Consulta",
+    "title": "Envíenos una Consulta",
+    "name": "Su Nombre",
+    "namePlaceholder": "Carlos García",
+    "email": "Correo Electrónico",
+    "emailPlaceholder": "carlos@example.com",
+    "company": "Empresa (Opcional)",
+    "companyPlaceholder": "Su Empresa S.L.",
+    "product": "Producto de Interés",
+    "selectProduct": "Seleccione un producto",
+    "message": "Mensaje",
+    "messagePlaceholder": "Cuéntenos sobre sus requisitos...",
+    "submit": "Enviar Consulta",
+    "sending": "Enviando...",
+    "success": "¡Gracias! Su consulta ha sido enviada con éxito. Le responderemos dentro de 24 horas.",
+    "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
+    "close": "Cerrar"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados.",
+    "products": "Productos",
+    "company": "Empresa",
+    "contact": "Contacto",
+    "email": "Correo",
+    "phone": "Teléfono"
+  }
+}

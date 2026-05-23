@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "首页",
+    "products": "产品中心",
+    "about": "关于我们",
+    "contact": "联系我们",
+    "catalog": "产品目录"
+  },
+  "hero": {
+    "title": "专业 LED 植物灯 & 节能照明解决方案",
+    "subtitle": "为商业温室、室内种植和工业应用提供高品质、高效率的照明解决方案。",
+    "cta": "探索产品",
+    "learnMore": "了解更多"
+  },
+  "categories": {
+    "title": "我们的产品",
+    "plant": {
+      "title": "LED 植物生长灯",
+      "desc": "专为植物各生长阶段设计的全光谱 LED 植物灯，从育苗到收获，全程优化。"
+    },
+    "energy": {
+      "title": "节能灯",
+      "desc": "高效率 LED 照明方案，在保持卓越亮度的同时，最多可降低 80% 的能耗。"
+    }
+  },
+  "features": {
+    "title": "为什么选择我们",
+    "items": [
+      {
+        "title": "节能高效",
+        "desc": "比传统照明方案节省高达 80% 的电费。"
+      },
+      {
+        "title": "全光谱",
+        "desc": "针对植物各生长阶段（从育苗到开花）优化的光谱方案。"
+      },
+      {
+        "title": "超长寿命",
+        "desc": "坚固耐用的设计，50000 小时以上稳定运行。"
+      },
+      {
+        "title": "环保安全",
+        "desc": "符合 RoHS 标准，无汞设计，材料可回收。"
+      }
+    ]
+  },
+  "featured": {
+    "title": "精选产品",
+    "viewAll": "查看全部产品"
+  },
+  "about": {
+    "title": "关于我们",
+    "subtitle": "LED 照明解决方案领先制造商",
+    "desc1": "拥有超过 15 年的 LED 照明制造经验，我们致力于为全球客户提供创新、节能的照明解决方案。",
+    "desc2": "我们的产品广泛应用于商业温室、室内农场、工业仓库和零售空间。我们以严格的质量控制和持续的研发投入而自豪。",
+    "values": {
+      "title": "我们的价值观",
+      "quality": {
+        "title": "质量第一",
+        "desc": "每件产品出厂前均经过严格测试。"
+      },
+      "innovation": {
+        "title": "持续创新",
+        "desc": "不断研发，为您带来最新的 LED 技术。"
+      },
+      "service": {
+        "title": "客户服务",
+        "desc": "专业支持团队随时为您服务。"
+      }
+    },
+    "contact": {
+      "title": "联系我们",
+      "desc": "对我们的产品有疑问？我们随时为您提供帮助！"
+    }
+  },
+  "products": {
+    "title": "产品中心",
+    "all": "全部",
+    "plant": "植物灯",
+    "energy": "节能灯",
+    "viewDetail": "查看详情",
+    "inquire": "发送询盘",
+    "relatedProducts": "相关产品",
+    "specs": "规格参数",
+    "description": "产品描述",
+    "features": "产品特点"
+  },
+  "chat": {
+    "button": "咨询",
+    "title": "发送询盘",
+    "name": "您的姓名",
+    "namePlaceholder": "张三",
+    "email": "邮箱地址",
+    "emailPlaceholder": "zhangsan@example.com",
+    "company": "公司名称（选填）",
+    "companyPlaceholder": "某某公司",
+    "product": "感兴趣的产品",
+    "selectProduct": "请选择产品",
+    "message": "咨询内容",
+    "messagePlaceholder": "请描述您的需求...",
+    "submit": "发送询盘",
+    "sending": "发送中...",
+    "success": "感谢您的询盘！我们将在 24 小时内与您联系。",
+    "error": "提交失败，请稍后重试。",
+    "close": "关闭"
+  },
+  "footer": {
+    "rights": "版权所有。",
+    "products": "产品",
+    "company": "公司",
+    "contact": "联系方式",
+    "email": "邮箱",
+    "phone": "电话"
+  }
+}

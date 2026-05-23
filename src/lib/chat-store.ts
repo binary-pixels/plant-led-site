@@ -1,0 +1,494 @@
+import { supabase, isSupabaseConfigured } from './supabase';
+import { translateToLanguages, getSupportedLocales } from './translate';
+
+// ---- In-memory fallback (used when Supabase is not configured) ----
+
+const memSessions = new Map<string, any>();
+const memMessages = new Map<string, any[]>();
+const memCustomers = new Map<string, any>();
+let memIdCounter = 0;
+
+function genId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${++memIdCounter}`;
+}
+
+// ---- Types (client-safe, no server deps) ----
+
+export interface ChatMessage {
+  id: string;
+  sessionId: string;
+  role: 'customer' | 'agent' | 'system';
+  text: string;
+  imageUrl?: string | null;
+  locale: string;
+  translations: Record<string, string>;
+  createdAt: number;
+}
+
+export interface ChatSession {
+  id: string;
+  customerLocale: string;
+  customerName: string;
+  customerEmail: string;
+  assignedAgentId?: string | null;
+  status: 'open' | 'closed';
+  lastActivity: number;
+  messages: ChatMessage[];
+}
+
+// ---- Helpers ----
+
+function toMessage(row: any): ChatMessage {
+  return {
+    id: row.id,
+    sessionId: row.session_id,
+    role: row.sender_type,
+    text: row.text ?? '',
+    imageUrl: row.image_url ?? null,
+    locale: row.sender_locale,
+    translations: {}, // filled separately
+    createdAt: new Date(row.created_at).getTime(),
+  };
+}
+
+function toSession(row: any, messages: ChatMessage[] = []): ChatSession {
+  return {
+    id: row.id,
+    customerLocale: row.customer_last_locale ?? 'en',
+    customerName: row.customer_name ?? 'Visitor',
+    customerEmail: row.customer_email ?? '',
+    assignedAgentId: row.assigned_agent_id,
+    status: row.status,
+    lastActivity: new Date(row.updated_at ?? row.created_at).getTime(),
+    messages,
+  };
+}
+
+// ---- In-memory fallback implementation ----
+
+function createSessionMem(
+  customerLocale: string,
+  customerName: string,
+  customerEmail: string
+): ChatSession {
+  const customerId = genId();
+  const sessionId = genId();
+  const now = Date.now();
+
+  memCustomers.set(customerId, {
+    id: customerId,
+    email: customerEmail || null,
+    name: customerName,
+    last_locale: customerLocale,
+  });
+
+  const session = {
+    id: sessionId,
+    customer_id: customerId,
+    customer_last_locale: customerLocale,
+    customer_name: customerName,
+    customer_email: customerEmail,
+    assigned_agent_id: null,
+    status: 'open' as const,
+    created_at: new Date(now).toISOString(),
+    updated_at: new Date(now).toISOString(),
+  };
+
+  memSessions.set(sessionId, session);
+  memMessages.set(sessionId, []);
+
+  return toSession(session, []);
+}
+
+function getMemSession(sessionId: string): ChatSession | null {
+  const row = memSessions.get(sessionId);
+  if (!row) return null;
+  const msgs = memMessages.get(sessionId) || [];
+  return toSession(row, msgs.map((m: any) => toMessage(m)));
+}
+
+function getAllMemSessions(): ChatSession[] {
+  const rows = Array.from(memSessions.values());
+  rows.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+  return rows.map((row: any) => {
+    const msgs = memMessages.get(row.id) || [];
+    return toSession(row, msgs.map((m: any) => toMessage(m)));
+  });
+}
+
+function addMessageMem(
+  sessionId: string,
+  role: 'customer' | 'agent',
+  text: string,
+  locale: string,
+  imageUrl?: string | null
+): ChatMessage | null {
+  const session = memSessions.get(sessionId);
+  if (!session) return null;
+
+  const msg = {
+    id: genId(),
+    session_id: sessionId,
+    sender_type: role,
+    sender_id: null,
+    text,
+    image_url: imageUrl || null,
+    sender_locale: locale,
+    created_at: new Date().toISOString(),
+  };
+
+  const msgs = memMessages.get(sessionId) || [];
+  msgs.push(msg);
+  memMessages.set(sessionId, msgs);
+
+  session.updated_at = new Date().toISOString();
+
+  return toMessage(msg);
+}
+
+function getMessagesMem(sessionId: string, since?: number): ChatMessage[] {
+  const msgs = memMessages.get(sessionId) || [];
+  let filtered = msgs;
+  if (since) {
+    filtered = msgs.filter((m: any) => new Date(m.created_at).getTime() > since);
+  }
+  // Build translation map (empty for in-memory)
+  return filtered.map((m: any) => ({ ...toMessage(m), translations: {} }));
+}
+
+function getSessionsByEmailMem(email: string): ChatSession[] {
+  const customerIds = new Set<string>();
+  for (const [id, c] of memCustomers) {
+    if (c.email === email) customerIds.add(id);
+  }
+  if (customerIds.size === 0) return [];
+
+  const sessions: ChatSession[] = [];
+  for (const [sid, row] of memSessions) {
+    if (customerIds.has(row.customer_id)) {
+      const msgs = memMessages.get(sid) || [];
+      sessions.push(toSession(row, msgs.map((m: any) => toMessage(m))));
+    }
+  }
+  sessions.sort((a, b) => b.lastActivity - a.lastActivity);
+  return sessions;
+}
+
+function assignAgentMem(sessionId: string, agentId: string): boolean {
+  const session = memSessions.get(sessionId);
+  if (!session) return false;
+  session.assigned_agent_id = agentId;
+  return true;
+}
+
+// ---- Session API ----
+
+export async function createSession(
+  customerLocale: string,
+  customerName: string,
+  customerEmail: string
+): Promise<ChatSession> {
+  if (!isSupabaseConfigured) {
+    return createSessionMem(customerLocale, customerName, customerEmail);
+  }
+
+  // Upsert customer
+  const { data: customer, error: custErr } = await supabase
+    .from('customers')
+    .upsert(
+      { email: customerEmail || null, name: customerName, last_locale: customerLocale },
+      { onConflict: 'email', ignoreDuplicates: false }
+    )
+    .select()
+    .single();
+
+  if (custErr || !customer) {
+    // Fallback to insert without email
+    const { data: c2 } = await supabase
+      .from('customers')
+      .insert({ name: customerName, last_locale: customerLocale })
+      .select()
+      .single();
+    if (!c2) throw new Error('Failed to create customer');
+  }
+
+  const customerRecord = customer || (await supabase
+    .from('customers')
+    .select()
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()).data;
+
+  const { data: session, error } = await supabase
+    .from('sessions')
+    .insert({
+      customer_id: customerRecord!.id,
+      status: 'open',
+    })
+    .select()
+    .single();
+
+  if (error || !session) throw new Error('Failed to create session');
+  return toSession(session);
+}
+
+export async function getSession(sessionId: string): Promise<ChatSession | null> {
+  if (!isSupabaseConfigured) return getMemSession(sessionId);
+
+  const { data: session } = await supabase
+    .from('sessions')
+    .select(`
+      *,
+      customers!inner(*)
+    `)
+    .eq('id', sessionId)
+    .single();
+
+  if (!session) return null;
+
+  const messages = await getMessages(sessionId);
+  return toSession(
+    {
+      ...session,
+      customer_name: session.customers?.name,
+      customer_email: session.customers?.email,
+      customer_last_locale: session.customers?.last_locale,
+    },
+    messages
+  );
+}
+
+export async function getAllSessions(): Promise<ChatSession[]> {
+  if (!isSupabaseConfigured) return getAllMemSessions();
+
+  const { data: rows } = await supabase
+    .from('sessions')
+    .select(`
+      *,
+      customers!inner(*)
+    `)
+    .order('updated_at', { ascending: false })
+    .limit(50);
+
+  if (!rows) return [];
+
+  const sessions: ChatSession[] = [];
+  for (const row of rows) {
+    const messages = await getMessages(row.id);
+    sessions.push(
+      toSession(
+        {
+          ...row,
+          customer_name: row.customers?.name,
+          customer_email: row.customers?.email,
+          customer_last_locale: row.customers?.last_locale,
+        },
+        messages
+      )
+    );
+  }
+  return sessions;
+}
+
+// ---- Message API ----
+
+export async function addMessage(
+  sessionId: string,
+  role: 'customer' | 'agent',
+  text: string,
+  locale: string,
+  imageUrl?: string | null
+): Promise<ChatMessage | null> {
+  if (!isSupabaseConfigured) return addMessageMem(sessionId, role, text, locale, imageUrl);
+
+  // Insert the message
+  const { data: msg, error } = await supabase
+    .from('messages')
+    .insert({
+      session_id: sessionId,
+      sender_type: role,
+      text,
+      image_url: imageUrl || null,
+      sender_locale: locale,
+    })
+    .select()
+    .single();
+
+  if (error || !msg) {
+    console.error('Failed to insert message:', error);
+    return null;
+  }
+
+  // Update session timestamp
+  await supabase
+    .from('sessions')
+    .update({ updated_at: new Date().toISOString() })
+    .eq('id', sessionId);
+
+  // Translate to all supported languages (async, don't block)
+  if (process.env.DEEPL_API_KEY) {
+    translateAndStore(msg.id, text, locale);
+  }
+
+  return toMessage(msg);
+}
+
+async function translateAndStore(
+  messageId: string,
+  text: string,
+  sourceLocale: string
+) {
+  if (!isSupabaseConfigured) return;
+  try {
+    const targets = getSupportedLocales().filter((l) => l !== sourceLocale);
+    const translations = await translateToLanguages(text, targets);
+
+    const rows = Object.entries(translations).map(([locale, translatedText]) => ({
+      message_id: messageId,
+      locale,
+      translated_text: translatedText,
+    }));
+
+    if (rows.length > 0) {
+      await supabase.from('message_translations').upsert(rows, {
+        onConflict: 'message_id, locale',
+        ignoreDuplicates: false,
+      });
+    }
+  } catch (err) {
+    console.error('Translation failed:', err);
+  }
+}
+
+export async function getMessages(
+  sessionId: string,
+  since?: number
+): Promise<ChatMessage[]> {
+  if (!isSupabaseConfigured) return getMessagesMem(sessionId, since);
+
+  let query = supabase
+    .from('messages')
+    .select('*')
+    .eq('session_id', sessionId)
+    .order('created_at', { ascending: true });
+
+  if (since) {
+    query = query.gte('created_at', new Date(since).toISOString());
+  }
+
+  const { data: rows } = await query;
+
+  if (!rows || rows.length === 0) return [];
+
+  // Fetch translations for all messages
+  const msgIds = rows.map((r) => r.id);
+  const { data: transRows } = await supabase
+    .from('message_translations')
+    .select('*')
+    .in('message_id', msgIds);
+
+  // Build translation map
+  const transMap: Record<string, Record<string, string>> = {};
+  if (transRows) {
+    for (const t of transRows) {
+      if (!transMap[t.message_id]) transMap[t.message_id] = {};
+      transMap[t.message_id][t.locale] = t.translated_text;
+    }
+  }
+
+  return rows.map((r) => ({
+    ...toMessage(r),
+    translations: transMap[r.id] ?? {},
+  }));
+}
+
+// ---- Customer history ----
+
+export async function getSessionsByEmail(email: string): Promise<ChatSession[]> {
+  if (!isSupabaseConfigured) return getSessionsByEmailMem(email);
+
+  const { data: customers } = await supabase
+    .from('customers')
+    .select('id')
+    .eq('email', email)
+    .limit(1);
+
+  if (!customers || customers.length === 0) return [];
+
+  const { data: rows } = await supabase
+    .from('sessions')
+    .select(`
+      *,
+      customers!inner(*)
+    `)
+    .eq('customer_id', customers[0].id)
+    .order('updated_at', { ascending: false })
+    .limit(20);
+
+  if (!rows) return [];
+
+  const sessions: ChatSession[] = [];
+  for (const row of rows) {
+    const messages = await getMessages(row.id);
+    sessions.push(
+      toSession(
+        {
+          ...row,
+          customer_name: row.customers?.name,
+          customer_email: row.customers?.email,
+          customer_last_locale: row.customers?.last_locale,
+        },
+        messages
+      )
+    );
+  }
+  return sessions;
+}
+
+// ---- Agent assignment ----
+
+export async function assignAgent(
+  sessionId: string,
+  agentId: string
+): Promise<boolean> {
+  if (!isSupabaseConfigured) return assignAgentMem(sessionId, agentId);
+
+  const { error } = await supabase
+    .from('sessions')
+    .update({ assigned_agent_id: agentId })
+    .eq('id', sessionId);
+
+  return !error;
+}
+
+export async function getAgentSessions(agentId: string): Promise<ChatSession[]> {
+  if (!isSupabaseConfigured) return [];
+
+  const { data: rows } = await supabase
+    .from('sessions')
+    .select(`
+      *,
+      customers!inner(*)
+    `)
+    .eq('assigned_agent_id', agentId)
+    .order('updated_at', { ascending: false });
+
+  if (!rows) return [];
+
+  const sessions: ChatSession[] = [];
+  for (const row of rows) {
+    const messages = await getMessages(row.id);
+    sessions.push(
+      toSession(
+        {
+          ...row,
+          customer_name: row.customers?.name,
+          customer_email: row.customers?.email,
+          customer_last_locale: row.customers?.last_locale,
+        },
+        messages
+      )
+    );
+  }
+  return sessions;
+}

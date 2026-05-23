@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "about": "About Us",
+    "contact": "Contact",
+    "catalog": "Catalog"
+  },
+  "hero": {
+    "title": "Professional LED Grow Lights & Energy-Saving Solutions",
+    "subtitle": "High-quality, efficient lighting solutions for commercial greenhouses, indoor farming, and industrial applications.",
+    "cta": "Explore Products",
+    "learnMore": "Learn More"
+  },
+  "categories": {
+    "title": "Our Products",
+    "plant": {
+      "title": "LED Grow Lights",
+      "desc": "Full-spectrum LED grow lights designed for optimal plant growth at every stage, from seedling to harvest."
+    },
+    "energy": {
+      "title": "Energy-Saving Lights",
+      "desc": "High-efficiency LED lighting solutions that reduce energy consumption by up to 80% while maintaining superior brightness."
+    }
+  },
+  "features": {
+    "title": "Why Choose Our Lights",
+    "items": [
+      {
+        "title": "Energy Efficient",
+        "desc": "Save up to 80% on electricity costs compared to traditional lighting solutions."
+      },
+      {
+        "title": "Full Spectrum",
+        "desc": "Optimized spectrum for all plant growth stages, from seedling to flowering."
+      },
+      {
+        "title": "Long Lifespan",
+        "desc": "Durable design with 50,000+ hours of reliable operation."
+      },
+      {
+        "title": "Eco-Friendly",
+        "desc": "RoHS compliant, mercury-free, and fully recyclable materials."
+      }
+    ]
+  },
+  "featured": {
+    "title": "Featured Products",
+    "viewAll": "View All Products"
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Leading Manufacturer of LED Lighting Solutions",
+    "desc1": "With over 15 years of experience in LED lighting manufacturing, we are dedicated to providing innovative, energy-efficient lighting solutions for global customers.",
+    "desc2": "Our products serve a wide range of applications including commercial greenhouses, indoor farms, industrial warehouses, and retail spaces. We pride ourselves on rigorous quality control and continuous R&D investment.",
+    "values": {
+      "title": "Our Values",
+      "quality": {
+        "title": "Quality First",
+        "desc": "Every product undergoes strict testing before shipment."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "desc": "Continuous R&D to bring you the latest LED technology."
+      },
+      "service": {
+        "title": "Customer Service",
+        "desc": "Professional support team ready to assist you anytime."
+      }
+    },
+    "contact": {
+      "title": "Get In Touch",
+      "desc": "Have questions about our products? We're here to help!"
+    }
+  },
+  "products": {
+    "title": "Our Products",
+    "all": "All",
+    "plant": "Grow Lights",
+    "energy": "Energy-Saving",
+    "viewDetail": "View Details",
+    "inquire": "Send Inquiry",
+    "relatedProducts": "Related Products",
+    "specs": "Specifications",
+    "description": "Description",
+    "features": "Features"
+  },
+  "chat": {
+    "button": "Inquiry",
+    "title": "Send Us an Inquiry",
+    "name": "Your Name",
+    "namePlaceholder": "John Smith",
+    "email": "Email Address",
+    "emailPlaceholder": "john@example.com",
+    "company": "Company (Optional)",
+    "companyPlaceholder": "Your Company Ltd.",
+    "product": "Interested Product",
+    "selectProduct": "Select a product",
+    "message": "Message",
+    "messagePlaceholder": "Tell us about your requirements...",
+    "submit": "Send Inquiry",
+    "sending": "Sending...",
+    "success": "Thank you! Your inquiry has been sent successfully. We will get back to you within 24 hours.",
+    "error": "Something went wrong. Please try again later.",
+    "close": "Close"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "products": "Products",
+    "company": "Company",
+    "contact": "Contact",
+    "email": "Email",
+    "phone": "Phone"
+  }
+}

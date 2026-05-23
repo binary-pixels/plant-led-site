@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "products": "Produkte",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "catalog": "Katalog"
+  },
+  "hero": {
+    "title": "Professionelle LED-Pflanzenlampen & Energiesparlösungen",
+    "subtitle": "Hochwertige, effiziente Beleuchtungslösungen für Gewächshäuser, Indoor-Farming und industrielle Anwendungen.",
+    "cta": "Produkte entdecken",
+    "learnMore": "Mehr erfahren"
+  },
+  "categories": {
+    "title": "Unsere Produkte",
+    "plant": {
+      "title": "LED-Pflanzenwachstumslampen",
+      "desc": "Vollspektrum-LED-Pflanzenlampen, optimiert für jede Wachstumsphase der Pflanze – von der Keimung bis zur Ernte."
+    },
+    "energy": {
+      "title": "Energiesparlampen",
+      "desc": "Hocheffiziente LED-Beleuchtungslösungen, die den Energieverbrauch bei gleichbleibend heller Beleuchtung um bis zu 80% senken."
+    }
+  },
+  "features": {
+    "title": "Warum unsere Lampen?",
+    "items": [
+      {
+        "title": "Energieeffizient",
+        "desc": "Sparen Sie bis zu 80% Stromkosten im Vergleich zu herkömmlicher Beleuchtung."
+      },
+      {
+        "title": "Vollspektrum",
+        "desc": "Optimiertes Spektrum für alle Pflanzenwachstumsphasen von der Keimung bis zur Blüte."
+      },
+      {
+        "title": "Lange Lebensdauer",
+        "desc": "Robustes Design mit über 50.000 Stunden zuverlässigem Betrieb."
+      },
+      {
+        "title": "Umweltfreundlich",
+        "desc": "RoHS-konform, quecksilberfrei und vollständig recycelbare Materialien."
+      }
+    ]
+  },
+  "featured": {
+    "title": "Ausgewählte Produkte",
+    "viewAll": "Alle Produkte anzeigen"
+  },
+  "about": {
+    "title": "Über uns",
+    "subtitle": "Führender Hersteller von LED-Beleuchtungslösungen",
+    "desc1": "Mit über 15 Jahren Erfahrung in der LED-Beleuchtungsherstellung bieten wir innovative, energieeffiziente Beleuchtungslösungen für Kunden weltweit.",
+    "desc2": "Unsere Produkte werden in Gewächshäusern, Indoor-Farmen, Industriehallen und Einzelhandelsflächen eingesetzt. Wir sind stolz auf unsere strenge Qualitätskontrolle und kontinuierliche F&E-Investitionen.",
+    "values": {
+      "title": "Unsere Werte",
+      "quality": {
+        "title": "Qualität zuerst",
+        "desc": "Jedes Produkt durchläuft vor dem Versand strenge Tests."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "desc": "Kontinuierliche F&E für die neueste LED-Technologie."
+      },
+      "service": {
+        "title": "Kundenservice",
+        "desc": "Unser professionelles Support-Team steht Ihnen jederzeit zur Verfügung."
+      }
+    },
+    "contact": {
+      "title": "Kontakt aufnehmen",
+      "desc": "Haben Sie Fragen zu unseren Produkten? Wir helfen Ihnen gerne!"
+    }
+  },
+  "products": {
+    "title": "Unsere Produkte",
+    "all": "Alle",
+    "plant": "Pflanzenlampen",
+    "energy": "Energiesparlampen",
+    "viewDetail": "Details anzeigen",
+    "inquire": "Anfrage senden",
+    "relatedProducts": "Ähnliche Produkte",
+    "specs": "Technische Daten",
+    "description": "Beschreibung",
+    "features": "Eigenschaften"
+  },
+  "chat": {
+    "button": "Anfrage",
+    "title": "Anfrage senden",
+    "name": "Name",
+    "namePlaceholder": "Max Mustermann",
+    "email": "E-Mail-Adresse",
+    "emailPlaceholder": "max@example.com",
+    "company": "Firma (optional)",
+    "companyPlaceholder": "Firma GmbH",
+    "product": "Interessiertes Produkt",
+    "selectProduct": "Produkt auswählen",
+    "message": "Nachricht",
+    "messagePlaceholder": "Teilen Sie uns Ihre Anforderungen mit...",
+    "submit": "Anfrage senden",
+    "sending": "Wird gesendet...",
+    "success": "Vielen Dank! Ihre Anfrage wurde erfolgreich gesendet. Wir werden uns innerhalb von 24 Stunden bei Ihnen melden.",
+    "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+    "close": "Schließen"
+  },
+  "footer": {
+    "rights": "Alle Rechte vorbehalten.",
+    "products": "Produkte",
+    "company": "Unternehmen",
+    "contact": "Kontakt",
+    "email": "E-Mail",
+    "phone": "Telefon"
+  }
+}

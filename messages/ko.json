@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "홈",
+    "products": "제품",
+    "about": "회사 소개",
+    "contact": "문의하기",
+    "catalog": "카탈로그"
+  },
+  "hero": {
+    "title": "전문가용 LED 식물 재배등 & 에너지 절약 솔루션",
+    "subtitle": "상업용 온실, 실내 농업 및 산업용 애플리케이션을 위한 고품질·고효율 조명 솔루션.",
+    "cta": "제품 보기",
+    "learnMore": "자세히 알아보기"
+  },
+  "categories": {
+    "title": "제품 카테고리",
+    "plant": {
+      "title": "LED 식물 재배등",
+      "desc": "묘목부터 수확까지 식물의 모든 성장 단계에 최적화된 풀 스펙트럼 LED 재배등."
+    },
+    "energy": {
+      "title": "에너지 절약 조명",
+      "desc": "탁월한 밝기를 유지하면서 최대 80%의 에너지 소비를 줄이는 고효율 LED 조명."
+    }
+  },
+  "features": {
+    "title": "선택해야 하는 이유",
+    "items": [
+      {
+        "title": "에너지 효율",
+        "desc": "기존 조명 대비 최대 80% 전기료 절감."
+      },
+      {
+        "title": "풀 스펙트럼",
+        "desc": "육묘부터 개화까지 모든 성장 단계에 최적화된 스펙트럼."
+      },
+      {
+        "title": "긴 수명",
+        "desc": "50,000시간 이상 안정적인 작동을 보장하는 내구성 설계."
+      },
+      {
+        "title": "친환경",
+        "desc": "RoHS 준수, 무수은, 완전 재활용 가능 소재."
+      }
+    ]
+  },
+  "featured": {
+    "title": "추천 제품",
+    "viewAll": "모든 제품 보기"
+  },
+  "about": {
+    "title": "회사 소개",
+    "subtitle": "LED 조명 솔루션 선도 제조업체",
+    "desc1": "15년 이상의 LED 조명 제조 경험을 바탕으로 혁신적이고 에너지 효율적인 조명 솔루션을 전 세계 고객에게 제공하고 있습니다.",
+    "desc2": "상업용 온실, 실내 농장, 산업용 창고, 소매 공간 등 다양한 분야에 제품을 공급합니다. 엄격한 품질 관리와 지속적인 R&D 투자를 자랑으로 여깁니다.",
+    "values": {
+      "title": "핵심 가치",
+      "quality": {
+        "title": "품질 우선",
+        "desc": "모든 제품은 출하 전 엄격한 테스트를 거칩니다."
+      },
+      "innovation": {
+        "title": "혁신",
+        "desc": "최신 LED 기술을 제공하기 위한 지속적인 연구개발."
+      },
+      "service": {
+        "title": "고객 서비스",
+        "desc": "전문 지원팀이 언제든지 도와드립니다."
+      }
+    },
+    "contact": {
+      "title": "문의하기",
+      "desc": "제품에 대해 궁금하신 점이 있으신가요? 언제든지 문의해 주세요!"
+    }
+  },
+  "products": {
+    "title": "제품",
+    "all": "전체",
+    "plant": "식물 재배등",
+    "energy": "에너지 절약",
+    "viewDetail": "자세히 보기",
+    "inquire": "문의하기",
+    "relatedProducts": "관련 제품",
+    "specs": "제품 사양",
+    "description": "제품 설명",
+    "features": "특징"
+  },
+  "chat": {
+    "button": "문의",
+    "title": "문의 보내기",
+    "name": "이름",
+    "namePlaceholder": "홍길동",
+    "email": "이메일",
+    "emailPlaceholder": "hong@example.com",
+    "company": "회사명 (선택)",
+    "companyPlaceholder": "㈜샘플",
+    "product": "관심 제품",
+    "selectProduct": "제품을 선택하세요",
+    "message": "문의 내용",
+    "messagePlaceholder": "요구 사항을 알려주세요...",
+    "submit": "문의 보내기",
+    "sending": "전송 중...",
+    "success": "문의해 주셔서 감사합니다. 24시간 이내에 연락드리겠습니다.",
+    "error": "오류가 발생했습니다. 나중에 다시 시도해 주세요.",
+    "close": "닫기"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "products": "제품",
+    "company": "회사",
+    "contact": "연락처",
+    "email": "이메일",
+    "phone": "전화"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "products": "製品一覧",
+    "about": "会社概要",
+    "contact": "お問い合わせ",
+    "catalog": "カタログ"
+  },
+  "hero": {
+    "title": "プロ用LED植物育成ライト＆省エネソリューション",
+    "subtitle": "商業温室、屋内農業、産業用アプリケーション向けの高品質・高効率な照明ソリューション。",
+    "cta": "製品を見る",
+    "learnMore": "もっと詳しく"
+  },
+  "categories": {
+    "title": "製品カテゴリー",
+    "plant": {
+      "title": "LED植物育成ライト",
+      "desc": "育苗から収穫まで、植物の各成長段階に最適化されたフルスペクトラムLED育成ライト。"
+    },
+    "energy": {
+      "title": "省エネ照明",
+      "desc": "優れた明るさを維持しながら、最大80%のエネルギー消費を削減する高効率LED照明。"
+    }
+  },
+  "features": {
+    "title": "選ばれる理由",
+    "items": [
+      {
+        "title": "省エネルギー",
+        "desc": "従来の照明と比較して最大80%の電気代削減。"
+      },
+      {
+        "title": "フルスペクトラム",
+        "desc": "育苗から開花まで全成長段階に最適化されたスペクトル。"
+      },
+      {
+        "title": "長寿命",
+        "desc": "50,000時間以上の安定動作を実現する耐久設計。"
+      },
+      {
+        "title": "環境に優しい",
+        "desc": "RoHS準拠、水銀フリー、完全リサイクル可能な素材。"
+      }
+    ]
+  },
+  "featured": {
+    "title": "おすすめ製品",
+    "viewAll": "すべての製品を見る"
+  },
+  "about": {
+    "title": "会社概要",
+    "subtitle": "LED照明ソリューションのリーディングメーカー",
+    "desc1": "15年以上のLED照明製造経験を持ち、革新的でエネルギー効率の高い照明ソリューションを世界中のお客様に提供しています。",
+    "desc2": "商業温室、屋内農場、産業用倉庫、小売スペースなど幅広い用途に対応。厳格な品質管理と継続的な研究開発投資を誇りとしています。",
+    "values": {
+      "title": "私たちの価値観",
+      "quality": {
+        "title": "品質第一",
+        "desc": "出荷前に全製品が厳格なテストを実施。"
+      },
+      "innovation": {
+        "title": "革新",
+        "desc": "最新のLED技術をお届けするための継続的な研究開発。"
+      },
+      "service": {
+        "title": "カスタマーサービス",
+        "desc": "専門サポートチームがいつでも対応。"
+      }
+    },
+    "contact": {
+      "title": "お問い合わせ",
+      "desc": "製品についてご質問がありますか？お気軽にご連絡ください！"
+    }
+  },
+  "products": {
+    "title": "製品一覧",
+    "all": "すべて",
+    "plant": "植物育成ライト",
+    "energy": "省エネ照明",
+    "viewDetail": "詳細を見る",
+    "inquire": "お問い合わせ",
+    "relatedProducts": "関連製品",
+    "specs": "仕様",
+    "description": "製品説明",
+    "features": "特長"
+  },
+  "chat": {
+    "button": "お問い合わせ",
+    "title": "お問い合わせフォーム",
+    "name": "お名前",
+    "namePlaceholder": "山田 太郎",
+    "email": "メールアドレス",
+    "emailPlaceholder": "taro@example.com",
+    "company": "会社名（任意）",
+    "companyPlaceholder": "株式会社サンプル",
+    "product": "対象製品",
+    "selectProduct": "製品を選択",
+    "message": "メッセージ",
+    "messagePlaceholder": "ご要望をお聞かせください...",
+    "submit": "送信する",
+    "sending": "送信中...",
+    "success": "お問い合わせありがとうございます。24時間以内にご連絡いたします。",
+    "error": "エラーが発生しました。後ほどもう一度お試しください。",
+    "close": "閉じる"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "products": "製品",
+    "company": "会社情報",
+    "contact": "お問い合わせ",
+    "email": "メール",
+    "phone": "電話"
+  }
+}
