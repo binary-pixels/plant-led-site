@@ -39,7 +39,9 @@ export default async function ProductDetailPage({ params }: Props) {
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
-  return <ProductDetailClient product={product} />;
+  return (
+    <ProductDetailClient product={product} />
+  );
 }
 
 export function generateStaticParams() {

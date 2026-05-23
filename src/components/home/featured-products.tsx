@@ -2,11 +2,12 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { products } from '@/lib/products';
+import { useProducts } from '@/lib/products-context';
 import ProductCard from '@/components/products/product-card';
 
 export default function FeaturedProducts() {
   const t = useTranslations('featured');
+  const { products } = useProducts();
   const featured = products.slice(0, 4);
 
   return (

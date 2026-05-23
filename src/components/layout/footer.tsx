@@ -1,9 +1,14 @@
-import { useTranslations } from 'next-intl';
+'use client';
+
+import { useLocale } from 'next-intl';
+import { useSettings } from '@/lib/settings-context';
 import { Link } from '@/i18n/navigation';
 
 export default function Footer() {
-  const t = useTranslations('footer');
-  const n = useTranslations('nav');
+  const locale = useLocale();
+  const { settings } = useSettings();
+  const contact = settings?.contact ?? { email: 'info@greenledtech.com', phone: '+86-755-8888-8888' };
+  const footerText = settings?.footer?.[locale] ?? settings?.footer?.en ?? { companyDesc: '', copyright: 'All rights reserved.' };
 
   return (
     <footer className="bg-gray-900 text-gray-300">
@@ -20,14 +25,13 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Professional LED grow lights and energy-saving lighting solutions
-              manufacturer.
+              {footerText.companyDesc}
             </p>
           </div>
 
           {/* Products */}
           <div>
-            <h3 className="text-white font-semibold mb-4">{t('products')}</h3>
+            <h3 className="text-white font-semibold mb-4">Products</h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -50,16 +54,16 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-white font-semibold mb-4">{t('contact')}</h3>
+            <h3 className="text-white font-semibold mb-4">Contact</h3>
             <ul className="space-y-2 text-sm">
-              <li>{t('email')}: info@greenledtech.com</li>
-              <li>{t('phone')}: +86-755-8888-8888</li>
+              <li>Email: {contact.email}</li>
+              <li>Phone: {contact.phone}</li>
               <li>
                 <Link
                   href="/about"
                   className="text-purple-400 hover:text-purple-300 transition-colors"
                 >
-                  {n('contact')} →
+                  Contact Us →
                 </Link>
               </li>
             </ul>
@@ -67,7 +71,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} GreenLedTech. {t('rights')}
+          © {new Date().getFullYear()} GreenLedTech. {footerText.copyright}
         </div>
       </div>
     </footer>

@@ -11,6 +11,10 @@ interface AgentInfo {
 
 const POLL_INTERVAL = 2000;
 
+function isAudioUrl(url: string): boolean {
+  return /\.(webm|mp3|wav|ogg|m4a)$/i.test(url);
+}
+
 const localeNames: Record<string, string> = {
   en: 'English',
   zh: '中文',
@@ -27,9 +31,15 @@ export default function AdminChatPage() {
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [recordingError, setRecordingError] = useState('');
   const [agent, setAgent] = useState<AgentInfo | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const activeSession = sessions.find((s) => s.id === activeSessionId);
 
@@ -49,6 +59,16 @@ export default function AdminChatPage() {
         setAgent(JSON.parse(stored));
       } catch {}
     }
+
+    // Cleanup media recorder on unmount
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
+    };
   }, []);
 
   // Poll sessions
@@ -80,6 +100,87 @@ export default function AdminChatPage() {
     } finally {
       setUploading(false);
     }
+  }
+
+  // ---- Voice Recording ----
+
+  async function startRecording() {
+    try {
+      setRecordingError('');
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      const chunks: Blob[] = [];
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((t) => t.stop());
+          streamRef.current = null;
+        }
+        if (recordingTimerRef.current) {
+          clearInterval(recordingTimerRef.current);
+          recordingTimerRef.current = null;
+        }
+        setRecordingTime(0);
+
+        setUploading(true);
+        const mimeType = recorder.mimeType || 'audio/webm';
+        const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
+        const blob = new Blob(chunks, { type: mimeType });
+        const file = new File([blob], `voice.${ext}`, { type: mimeType });
+
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          const res = await fetch('/api/upload', { method: 'POST', body: formData });
+          const data = await res.json();
+          if (data.url) {
+            await sendAsAgent(data.url);
+          }
+        } catch {
+          // fallback
+        } finally {
+          setUploading(false);
+        }
+      };
+
+      recorder.start();
+      setRecording(true);
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingTime((t) => t + 1);
+      }, 1000);
+    } catch (err) {
+      setRecordingError(
+        err instanceof DOMException && err.name === 'NotAllowedError'
+          ? 'Microphone access denied. Please allow microphone permissions.'
+          : 'Could not start recording. Please try again.'
+      );
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    setRecording(false);
+  }
+
+  function toggleRecording() {
+    if (recording) stopRecording();
+    else startRecording();
+  }
+
+  function formatTime(seconds: number): string {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
   async function sendAsAgent(imageUrl?: string) {
@@ -130,7 +231,7 @@ export default function AdminChatPage() {
   function getLastMessagePreview(session: ChatSession): string {
     if (session.messages.length === 0) return 'No messages yet';
     const last = session.messages[session.messages.length - 1];
-    const preview = last.text && last.text.trim() ? last.text.slice(0, 50) : last.imageUrl ? '[Image]' : '';
+    const preview = last.text && last.text.trim() ? last.text.slice(0, 50) : last.imageUrl ? (isAudioUrl(last.imageUrl) ? '[Voice]' : '[Image]') : '';
     return `${last.role === 'customer' ? '→' : '←'} ${preview}`;
   }
 
@@ -187,7 +288,7 @@ export default function AdminChatPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="text-sm font-semibold text-gray-900 truncate">
-                      {session.customerName}
+                      {session.customerEmail || session.customerName}
                     </span>
                     {unread > 0 && (
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">
@@ -206,6 +307,16 @@ export default function AdminChatPage() {
                   <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
                     {session.customerLocale.toUpperCase()}
                   </span>
+                  {session.customerName && session.customerEmail && (
+                    <span className="text-[10px] text-gray-400 truncate max-w-[100px]">
+                      {session.customerName}
+                    </span>
+                  )}
+                  {!session.customerEmail && session.customerName && (
+                    <span className="text-[10px] text-gray-400 truncate">
+                      No email
+                    </span>
+                  )}
                   {isUnassigned && (
                     <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-700">
                       Unassigned
@@ -235,15 +346,20 @@ export default function AdminChatPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-gray-900">
-                    {activeSession.customerName}
+                    {activeSession.customerEmail || activeSession.customerName}
                   </span>
+                  {activeSession.customerName && activeSession.customerEmail && (
+                    <span className="text-xs text-gray-400">
+                      ({activeSession.customerName})
+                    </span>
+                  )}
                   <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">
                     {localeNames[activeSession.customerLocale] ?? activeSession.customerLocale}
                   </span>
                 </div>
                 {activeSession.customerEmail && (
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {activeSession.customerEmail}
+                    <span className="font-medium">Email:</span> {activeSession.customerEmail}
                   </p>
                 )}
               </div>
@@ -304,12 +420,22 @@ export default function AdminChatPage() {
                     </p>
 
                     {/* Image */}
-                    {msg.imageUrl && (
+                    {msg.imageUrl && !isAudioUrl(msg.imageUrl) && (
                       <img
                         src={msg.imageUrl}
                         alt=""
                         className="max-w-full rounded-lg mb-2 max-h-48 object-cover"
                       />
+                    )}
+
+                    {/* Voice message */}
+                    {msg.imageUrl && isAudioUrl(msg.imageUrl) && (
+                      <div className="mb-2 flex items-center gap-2">
+                        <svg className={`w-4 h-4 shrink-0 ${msg.role === 'agent' ? 'text-purple-300' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                        <audio src={msg.imageUrl} controls preload="metadata" className="h-9 max-w-[200px] rounded-lg" />
+                      </div>
                     )}
 
                     {/* Original text */}
@@ -377,10 +503,10 @@ export default function AdminChatPage() {
               <div ref={messagesEndRef} />
             </div>
 
-            {error && (
+            {(error || recordingError) && (
               <div className="px-6 py-2 bg-red-50 text-red-600 text-sm border-t border-red-100">
-                {error}
-                <button onClick={() => setError('')} className="ml-2 text-red-400 hover:text-red-600">
+                {error || recordingError}
+                <button onClick={() => { setError(''); setRecordingError(''); }} className="ml-2 text-red-400 hover:text-red-600">
                   ×
                 </button>
               </div>
@@ -433,6 +559,28 @@ export default function AdminChatPage() {
                       e.target.value = '';
                     }}
                   />
+                  {/* Voice recording button */}
+                  <button
+                    onClick={toggleRecording}
+                    disabled={uploading}
+                    className={`p-2.5 rounded-xl transition-colors disabled:opacity-50 ${
+                      recording
+                        ? 'bg-red-500 text-white animate-pulse'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                    title={recording ? 'Stop recording' : 'Record voice message'}
+                  >
+                    {recording ? (
+                      <span className="flex items-center gap-1 text-xs font-medium">
+                        <span className="w-2 h-2 bg-white rounded-full" />
+                        {formatTime(recordingTime)}
+                      </span>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                      </svg>
+                    )}
+                  </button>
                   <button
                     onClick={() => sendAsAgent()}
                     disabled={!input.trim()}

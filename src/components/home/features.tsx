@@ -1,6 +1,7 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useSettings } from '@/lib/settings-context';
 
 const icons = [
   // Energy Efficient
@@ -23,15 +24,17 @@ const icons = [
 ];
 
 export default function Features() {
-  const t = useTranslations('features');
-  const items = t.raw('items') as Array<{ title: string; desc: string }>;
+  const locale = useLocale();
+  const { settings } = useSettings();
+  const rawItems = settings?.features ?? [];
+  const items = rawItems.map((item) => item[locale] ?? item.en ?? { title: '', desc: '' });
 
   return (
     <section className="py-16 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            {t('title')}
+            Why Choose Our Lights
           </h2>
           <div className="mt-2 w-16 h-1 bg-purple-600 rounded mx-auto" />
         </div>

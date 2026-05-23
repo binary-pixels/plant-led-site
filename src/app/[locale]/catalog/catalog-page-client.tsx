@@ -1,13 +1,13 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
-import { useProducts } from '@/lib/products-context';
+import { useTranslations } from 'next-intl';
+import type { Product } from '@/lib/products';
+import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 
-export default function CatalogPage() {
+export default function CatalogPageClient({ products }: { products: Product[] }) {
   const t = useTranslations('products');
   const locale = useLocale();
-  const { products } = useProducts();
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

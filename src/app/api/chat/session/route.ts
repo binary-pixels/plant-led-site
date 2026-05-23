@@ -12,10 +12,17 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json(
+        { error: 'A valid email is required' },
+        { status: 400 }
+      );
+    }
+
     const session = await createSession(
       locale,
-      name || 'Visitor',
-      email || ''
+      name?.trim() || email.split('@')[0],
+      email.trim()
     );
 
     return NextResponse.json({ sessionId: session.id });

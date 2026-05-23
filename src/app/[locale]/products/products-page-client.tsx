@@ -2,7 +2,8 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { products, type ProductCategory } from '@/lib/products';
+import { useProducts } from '@/lib/products-context';
+import type { ProductCategory } from '@/lib/products-context';
 import ProductCard from '@/components/products/product-card';
 
 const categories: { key: ProductCategory | 'all'; filter: string }[] = [
@@ -17,6 +18,7 @@ export default function ProductsPageClient({
   initialCategory?: string;
 }) {
   const t = useTranslations('products');
+  const { products } = useProducts();
   const [activeCategory, setActiveCategory] = useState<ProductCategory | 'all'>(
     initialCategory === 'plant' || initialCategory === 'energy'
       ? (initialCategory as ProductCategory)
@@ -29,11 +31,11 @@ export default function ProductsPageClient({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="text-center mb-10">
+      <div className="text-left mb-10">
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
           {t('title')}
         </h1>
-        <div className="mt-2 w-16 h-1 bg-purple-600 rounded mx-auto" />
+        <div className="mt-2 w-16 h-1 bg-purple-600 rounded" />
       </div>
 
       {/* Category Filter */}

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useSettings } from '@/lib/settings-context';
 import { Link } from '@/i18n/navigation';
 
 const images = [
@@ -10,8 +11,11 @@ const images = [
 ];
 
 export default function Hero() {
-  const t = useTranslations('hero');
+  const locale = useLocale();
+  const { settings } = useSettings();
   const [current, setCurrent] = useState(0);
+
+  const heroContent = settings?.hero?.[locale] ?? settings?.hero?.en ?? null;
 
   // Auto-rotate every 5 seconds
   useEffect(() => {
@@ -56,17 +60,17 @@ export default function Hero() {
       <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
         <div className="max-w-2xl">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-white">
-            {t('title')}
+            {heroContent?.title || 'Professional LED Grow Lights'}
           </h1>
-          <p className="mt-6 text-lg sm:text-xl text-purple-100 leading-relaxed">
-            {t('subtitle')}
+          <p className="mt-6 text-lg sm:text-xl text-white leading-relaxed">
+            {heroContent?.subtitle || ''}
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/products"
               className="inline-flex items-center px-6 py-3 rounded-lg bg-yellow-400 text-gray-900 font-semibold hover:bg-yellow-300 transition-colors"
             >
-              {t('cta')}
+              {heroContent?.cta || 'Explore Products'}
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -75,7 +79,7 @@ export default function Hero() {
               href="/about"
               className="inline-flex items-center px-6 py-3 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-colors"
             >
-              {t('learnMore')}
+              {heroContent?.learnMore || 'Learn More'}
             </Link>
           </div>
         </div>

@@ -92,3 +92,4 @@ CREATE POLICY "agents_read_session_messages" ON messages
 -- Anyone can create a customer (for anonymous chat)
 CREATE POLICY "anyone_can_insert_customer" ON customers
   FOR INSERT WITH CHECK (true);
+

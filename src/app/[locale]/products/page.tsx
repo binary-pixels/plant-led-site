@@ -31,5 +31,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   const { category } = await searchParams;
   setRequestLocale(locale);
 
-  return <ProductsPageClient initialCategory={category} />;
+  return (
+    <ProductsPageClient initialCategory={category} />
+  );
 }

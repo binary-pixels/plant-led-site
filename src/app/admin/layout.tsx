@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import AdminAuthGuard from '@/components/admin/auth-guard';
 
 export const metadata: Metadata = {
-  title: 'Admin - Chat Dashboard | GreenLedTech',
+  title: 'Admin Dashboard | GreenLedTech',
   robots: { index: false, follow: false },
 };
 

@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 
 export async function POST(request: Request) {
   try {
@@ -9,60 +11,53 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'audio/webm', 'audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4',
+    ];
+    // Normalize mime type (strip codecs params like ";codecs=opus")
+    const baseType = file.type.split(';')[0].trim();
+    if (!allowedTypes.includes(baseType)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP' },
+        { error: 'Invalid file type' },
         { status: 400 }
       );
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
-        { error: 'File too large. Max 5MB' },
+        { error: 'File too large. Max 10MB' },
         { status: 400 }
       );
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const extMap: Record<string, string> = {
+      'audio/webm': 'webm',
+      'audio/mp4': 'm4a',
+      'audio/mpeg': 'mp3',
+      'audio/wav': 'wav',
+      'audio/ogg': 'ogg',
+      'audio/mp3': 'mp3',
+    };
+    const ext = file.name.split('.').pop() || extMap[baseType] || (baseType === 'audio/webm' ? 'webm' : 'jpg');
+    const isAudio = baseType.startsWith('audio/');
+    const uploadDir = isAudio
+      ? path.join(process.cwd(), 'public', 'audio')
+      : path.join(process.cwd(), 'public', 'images', 'products');
 
-    // Upload to Supabase Storage if configured
-    if (supabaseUrl && supabaseAnonKey) {
-      const { createClient } = await import('@supabase/supabase-js');
-      const sb = createClient(supabaseUrl, supabaseAnonKey);
-
-      const ext = file.name.split('.').pop() || 'jpg';
-      const fileName = `chat-images/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-
-      const { data, error } = await sb.storage
-        .from('chat-uploads')
-        .upload(fileName, file, {
-          contentType: file.type,
-        });
-
-      if (error) {
-        return NextResponse.json(
-          { error: 'Upload failed: ' + error.message },
-          { status: 500 }
-        );
-      }
-
-      const { data: urlData } = sb.storage
-        .from('chat-uploads')
-        .getPublicUrl(fileName);
-
-      return NextResponse.json({ url: urlData.publicUrl });
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    // Fallback: base64 data URL (only for small images in development)
-    const buffer = await file.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString('base64');
-    const dataUrl = `data:${file.type};base64,${base64}`;
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const filePath = path.join(uploadDir, filename);
+    fs.writeFileSync(filePath, buffer);
 
-    return NextResponse.json({ url: dataUrl, warning: 'Using base64 fallback' });
+    const basePath = isAudio ? '/audio' : '/images/products';
+    return NextResponse.json({
+      url: `${basePath}/${filename}`,
+    });
   } catch {
     return NextResponse.json(
       { error: 'Upload failed' },

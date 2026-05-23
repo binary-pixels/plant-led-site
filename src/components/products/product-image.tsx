@@ -28,7 +28,7 @@ export default function ProductImage({
 
   return (
     <div
-      className={`bg-gradient-to-br ${colors.bg} flex items-center justify-center relative overflow-hidden ${className}`}
+      className={`bg-linear-to-br ${colors.bg} flex items-center justify-center relative overflow-hidden ${className}`}
     >
       {/* Decorative circles */}
       <div className="absolute top-4 right-4 w-24 h-24 rounded-full bg-white/40" />

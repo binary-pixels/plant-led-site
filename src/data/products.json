@@ -1,0 +1,638 @@
+[
+  {
+    "id": "p-001",
+    "slug": "full-spectrum-600w-led-grow-light",
+    "name": {
+      "en": "Full Spectrum 600W LED Grow Light",
+      "zh": "全光谱600W LED植物生长灯",
+      "es": "Luz LED de Cultivo 600W Espectro Completo"
+    },
+    "category": "plant",
+    "image": "",
+    "images": [],
+    "description": {
+      "en": "Professional full-spectrum 600W LED grow light designed for commercial greenhouses and indoor farms. Features Samsung diodes and MeanWell driver for maximum efficiency and reliability.",
+      "zh": "专业全光谱600W LED植物生长灯，专为商业温室和室内农场设计。采用三星灯珠和明纬电源，提供最高效率和可靠性。",
+      "es": "Luz LED de cultivo de espectro completo de 600W profesional diseñada para invernaderos comerciales y granjas de interior. Cuenta con diodos Samsung y driver MeanWell para máxima eficiencia y confiabilidad."
+    },
+    "specs": {
+      "en": {
+        "Power": "600W",
+        "PPF": "1800 µmol/s",
+        "PPE": "3.0 µmol/J",
+        "Spectrum": "Full Spectrum 380-780nm",
+        "Input Voltage": "AC100-277V",
+        "Lifespan": "50,000+ hours",
+        "Dimming": "0-10V / Bluetooth",
+        "Coverage": "4x4 ft at 18\"",
+        "Weight": "12.5 lbs"
+      },
+      "zh": {
+        "功率": "600W",
+        "PPF": "1800 µmol/s",
+        "PPE": "3.0 µmol/J",
+        "光谱": "全光谱 380-780nm",
+        "输入电压": "AC100-277V",
+        "寿命": "50000+ 小时",
+        "调光": "0-10V / 蓝牙",
+        "覆盖面积": "4x4 英尺 @ 18英寸",
+        "重量": "12.5 磅"
+      },
+      "es": {
+        "Potencia": "600W",
+        "PPF": "1800 µmol/s",
+        "PPE": "3.0 µmol/J",
+        "Espectro": "Espectro Completo 380-780nm",
+        "Voltaje de Entrada": "AC100-277V",
+        "Vida Útil": "50,000+ horas",
+        "Regulación": "0-10V / Bluetooth",
+        "Cobertura": "4x4 pies a 18\"",
+        "Peso": "12.5 libras"
+      }
+    },
+    "features": {
+      "en": [
+        "Samsung LM301B diodes for high efficiency",
+        "MeanWell HLG driver for stable performance",
+        "Full spectrum with enhanced red & blue for flowering",
+        "Daisy chain capable up to 20 units",
+        "Passive cooling design - no noisy fans",
+        "5-year warranty"
+      ],
+      "zh": [
+        "三星 LM301B 灯珠，高效节能",
+        "明纬 HLG 电源，性能稳定",
+        "增强红蓝光的全光谱，促进开花",
+        "支持菊花链连接，最多 20 台",
+        "被动散热设计，无噪音风扇",
+        "5 年质保"
+      ],
+      "es": [
+        "Diodos Samsung LM301B para alta eficiencia",
+        "Driver MeanWell HLG para rendimiento estable",
+        "Espectro completo con rojo y azul mejorados para floración",
+        "Conexión en cadena de hasta 20 unidades",
+        "Diseño de refrigeración pasiva - sin ventiladores ruidosos",
+        "Garantía de 5 años"
+      ]
+    }
+  },
+  {
+    "id": "p-002",
+    "slug": "foldable-1000w-led-grow-light",
+    "name": {
+      "en": "Foldable 1000W LED Grow Light",
+      "zh": "可折叠1000W LED植物生长灯",
+      "es": "Luz LED de Cultivo Plegable 1000W"
+    },
+    "category": "plant",
+    "image": "",
+    "images": [],
+    "description": {
+      "en": "High-power foldable LED grow light with Samsung LM301H EVO diodes. Ideal for large-scale commercial cultivation with exceptional uniformity and penetration.",
+      "zh": "高功率可折叠 LED 植物生长灯，采用三星 LM301H EVO 灯珠。适用于大规模商业种植，具有卓越的光均匀度和穿透力。",
+      "es": "Luz LED de cultivo plegable de alta potencia con diodos Samsung LM301H EVO. Ideal para cultivos comerciales a gran escala con excepcional uniformidad y penetración."
+    },
+    "specs": {
+      "en": {
+        "Power": "1000W",
+        "PPF": "3000 µmol/s",
+        "PPE": "3.0 µmol/J",
+        "Spectrum": "Full Spectrum 380-780nm",
+        "Input Voltage": "AC100-277V",
+        "Lifespan": "60,000+ hours",
+        "Dimming": "0-10V / WiFi",
+        "Coverage": "5x5 ft at 18\"",
+        "Foldable": "Yes"
+      },
+      "zh": {
+        "功率": "1000W",
+        "PPF": "3000 µmol/s",
+        "PPE": "3.0 µmol/J",
+        "光谱": "全光谱 380-780nm",
+        "输入电压": "AC100-277V",
+        "寿命": "60000+ 小时",
+        "调光": "0-10V / WiFi",
+        "覆盖面积": "5x5 英尺 @ 18英寸",
+        "可折叠": "是"
+      },
+      "es": {
+        "Potencia": "1000W",
+        "PPF": "3000 µmol/s",
+        "PPE": "3.0 µmol/J",
+        "Espectro": "Espectro Completo 380-780nm",
+        "Voltaje de Entrada": "AC100-277V",
+        "Vida Útil": "60,000+ horas",
+        "Regulación": "0-10V / WiFi",
+        "Cobertura": "5x5 pies a 18\"",
+        "Plegable": "Sí"
+      }
+    },
+    "features": {
+      "en": [
+        "Samsung LM301H EVO diodes - top efficiency",
+        "Foldable design for easy shipping and storage",
+        "Ultra-high PPF output for maximum yield",
+        "WiFi smart control compatible",
+        "Aluminum heatsink for superior heat dissipation",
+        "IP65 waterproof rating"
+      ],
+      "zh": [
+        "三星 LM301H EVO 灯珠，顶级效率",
+        "可折叠设计，便于运输和存储",
+        "超高 PPF 输出，最大化产量",
+        "支持 WiFi 智能控制",
+        "铝合金散热片，卓越散热性能",
+        "IP65 防水等级"
+      ],
+      "es": [
+        "Diodos Samsung LM301H EVO - máxima eficiencia",
+        "Diseño plegable para fácil envío y almacenamiento",
+        "Salida PPF ultra alta para máximo rendimiento",
+        "Compatible con control inteligente WiFi",
+        "Disipador de aluminio para disipación superior de calor",
+        "Clasificación impermeable IP65"
+      ]
+    }
+  },
+  {
+    "id": "p-003",
+    "slug": "240w-led-grow-light-bar",
+    "name": {
+      "en": "240W LED Grow Light Bar",
+      "zh": "240W LED 植物生长灯条",
+      "es": "Barra de Luz LED para Cultivo 240W"
+    },
+    "category": "plant",
+    "image": "",
+    "images": [],
+    "description": {
+      "en": "Versatile 240W LED grow light bar perfect for vertical farming and shelf growing. Compact design with high efficiency.",
+      "zh": "多功能 240W LED 植物生长灯条，非常适合垂直农场和货架种植。紧凑设计，高效率。",
+      "es": "Barra de luz LED de cultivo versátil de 240W perfecta para agricultura vertical y estanterías. Diseño compacto con alta eficiencia."
+    },
+    "specs": {
+      "en": {
+        "Power": "240W",
+        "PPF": "720 µmol/s",
+        "PPE": "3.0 µmol/J",
+        "Spectrum": "Full Spectrum",
+        "Input Voltage": "AC100-277V",
+        "Lifespan": "50,000+ hours",
+        "Dimming": "0-10V",
+        "Dimensions": "44\" x 4\" x 1.5\"",
+        "Weight": "4.5 lbs"
+      },
+      "zh": {
+        "功率": "240W",
+        "PPF": "720 µmol/s",
+        "PPE": "3.0 µmol/J",
+        "光谱": "全光谱",
+        "输入电压": "AC100-277V",
+        "寿命": "50000+ 小时",
+        "调光": "0-10V",
+        "尺寸": "44 x 4 x 1.5 英寸",
+        "重量": "4.5 磅"
+      },
+      "es": {
+        "Potencia": "240W",
+        "PPF": "720 µmol/s",
+        "PPE": "3.0 µmol/J",
+        "Espectro": "Espectro Completo",
+        "Voltaje de Entrada": "AC100-277V",
+        "Vida Útil": "50,000+ horas",
+        "Regulación": "0-10V",
+        "Dimensiones": "44\" x 4\" x 1.5\"",
+        "Peso": "4.5 libras"
+      }
+    },
+    "features": {
+      "en": [
+        "Ideal for vertical farming and multi-layer shelving",
+        "Ultra-slim profile for tight spaces",
+        "High PPE for maximum energy savings",
+        "Easy daisy chain installation",
+        "Low heat output for safe close-canopy operation",
+        "ETL listed, FCC compliant"
+      ],
+      "zh": [
+        "非常适合垂直农场和多层货架",
+        "超薄设计，适合狭小空间",
+        "高 PPE，最大化节能效果",
+        "易于菊花链安装",
+        "低热量输出，安全近距离照射",
+        "ETL 认证，FCC 合规"
+      ],
+      "es": [
+        "Ideal para agricultura vertical y estanterías multicapa",
+        "Perfil ultradelgado para espacios reducidos",
+        "Alta PPE para máximo ahorro de energía",
+        "Fácil instalación en cadena",
+        "Baja emisión de calor para operación segura cerca del dosel",
+        "Certificado ETL, compatible con FCC"
+      ]
+    }
+  },
+  {
+    "id": "p-004",
+    "slug": "150w-led-grow-light-bulb",
+    "name": {
+      "en": "150W LED Grow Light Bulb (E26/E27)",
+      "zh": "150W LED 植物生长灯泡 (E26/E27)",
+      "es": "Bombilla LED de Cultivo 150W (E26/E27)"
+    },
+    "category": "plant",
+    "image": "",
+    "images": [],
+    "description": {
+      "en": "Easy-to-install LED grow light bulb with standard E26/E27 base. Perfect for small indoor gardens and home growing.",
+      "zh": "易于安装的 LED 植物生长灯泡，标准 E26/E27 接口。适合小型室内花园和家庭种植。",
+      "es": "Bombilla LED de cultivo fácil de instalar con base estándar E26/E27. Perfecta para pequeños jardines interiores y cultivo doméstico."
+    },
+    "specs": {
+      "en": {
+        "Power": "150W",
+        "PPF": "360 µmol/s",
+        "PPE": "2.4 µmol/J",
+        "Spectrum": "Red + Blue + White",
+        "Input Voltage": "AC100-277V",
+        "Lifespan": "30,000+ hours",
+        "Base Type": "E26/E27",
+        "Coverage": "2x2 ft at 12\"",
+        "Weight": "0.8 lbs"
+      },
+      "zh": {
+        "功率": "150W",
+        "PPF": "360 µmol/s",
+        "PPE": "2.4 µmol/J",
+        "光谱": "红+蓝+白",
+        "输入电压": "AC100-277V",
+        "寿命": "30000+ 小时",
+        "接口类型": "E26/E27",
+        "覆盖面积": "2x2 英尺 @ 12英寸",
+        "重量": "0.8 磅"
+      },
+      "es": {
+        "Potencia": "150W",
+        "PPF": "360 µmol/s",
+        "PPE": "2.4 µmol/J",
+        "Espectro": "Rojo + Azul + Blanco",
+        "Voltaje de Entrada": "AC100-277V",
+        "Vida Útil": "30,000+ horas",
+        "Tipo de Base": "E26/E27",
+        "Cobertura": "2x2 pies a 12\"",
+        "Peso": "0.8 libras"
+      }
+    },
+    "features": {
+      "en": [
+        "Standard E26/E27 base, easy retrofit",
+        "Built-in cooling fan for heat management",
+        "Dual spectrum switch (Veg/Bloom)",
+        "Perfect for home growers and hobbyists",
+        "Energy-saving replacement for HPS bulbs",
+        "CE & RoHS certified"
+      ],
+      "zh": [
+        "标准 E26/E27 接口，易于更换",
+        "内置散热风扇，有效管理热量",
+        "双光谱切换（生长/开花模式）",
+        "适合家庭种植和爱好者",
+        "节能替代 HPS 灯泡",
+        "CE & RoHS 认证"
+      ],
+      "es": [
+        "Base estándar E26/E27, fácil reemplazo",
+        "Ventilador de refrigeración integrado para gestión del calor",
+        "Interruptor de espectro dual (Veg/Bloom)",
+        "Perfecto para cultivadores domésticos y aficionados",
+        "Reemplazo de ahorro energético para bombillas HPS",
+        "Certificado CE y RoHS"
+      ]
+    }
+  },
+  {
+    "id": "e-001",
+    "slug": "200w-led-high-bay-light",
+    "name": {
+      "en": "200W LED High Bay Light",
+      "zh": "200W LED 工矿灯",
+      "es": "Luz LED de Alta Bahía 200W"
+    },
+    "category": "energy",
+    "image": "",
+    "images": [],
+    "description": {
+      "en": "Industrial-grade 200W LED high bay light designed for warehouses, factories, and large indoor spaces. Replaces 400W traditional HID fixtures.",
+      "zh": "工业级 200W LED 工矿灯，专为仓库、工厂和大型室内空间设计。可替代 400W 传统 HID 灯具。",
+      "es": "Luz LED de alta bahía de 200W de grado industrial diseñada para almacenes, fábricas y grandes espacios interiores. Reemplaza luminarias HID tradicionales de 400W."
+    },
+    "specs": {
+      "en": {
+        "Power": "200W",
+        "Lumens": "30,000 lm",
+        "Efficacy": "150 lm/W",
+        "Color Temp": "3000K-6500K",
+        "Input Voltage": "AC100-277V",
+        "Lifespan": "50,000+ hours",
+        "CRI": "Ra>80",
+        "Beam Angle": "90°/120°",
+        "IP Rating": "IP65",
+        "Weight": "4.2 lbs"
+      },
+      "zh": {
+        "功率": "200W",
+        "光通量": "30000 lm",
+        "光效": "150 lm/W",
+        "色温": "3000K-6500K",
+        "输入电压": "AC100-277V",
+        "寿命": "50000+ 小时",
+        "显色指数": "Ra>80",
+        "光束角": "90°/120°",
+        "防护等级": "IP65",
+        "重量": "4.2 磅"
+      },
+      "es": {
+        "Potencia": "200W",
+        "Lúmenes": "30,000 lm",
+        "Eficacia": "150 lm/W",
+        "Temp. Color": "3000K-6500K",
+        "Voltaje de Entrada": "AC100-277V",
+        "Vida Útil": "50,000+ horas",
+        "IRC": "Ra>80",
+        "Ángulo de Haz": "90°/120°",
+        "Clasificación IP": "IP65",
+        "Peso": "4.2 libras"
+      }
+    },
+    "features": {
+      "en": [
+        "Replaces 400W MH/HPS with 60% energy savings",
+        "High lumens output for large spaces",
+        "Selectable color temperature (CCT)",
+        "Isolated driver design for safety",
+        "Quick-mount bracket included",
+        "5-year warranty"
+      ],
+      "zh": [
+        "替代 400W MH/HPS，节能 60%",
+        "高光通量输出，适合大空间",
+        "可选色温 (CCT)",
+        "隔离电源设计，安全可靠",
+        "包含快速安装支架",
+        "5 年质保"
+      ],
+      "es": [
+        "Reemplaza 400W MH/HPS con un 60% de ahorro de energía",
+        "Alta salida de lúmenes para grandes espacios",
+        "Temperatura de color seleccionable (CCT)",
+        "Diseño de driver aislado para seguridad",
+        "Soporte de montaje rápido incluido",
+        "Garantía de 5 años"
+      ]
+    }
+  },
+  {
+    "id": "e-002",
+    "slug": "50w-led-tri-proof-light",
+    "name": {
+      "en": "50W LED Tri-Proof Light",
+      "zh": "50W LED 三防灯",
+      "es": "Luz LED Tri-Proof 50W"
+    },
+    "category": "energy",
+    "image": "",
+    "images": [],
+    "description": {
+      "en": "Waterproof, dustproof, and corrosion-proof LED tri-proof light. Ideal for parking garages, workshops, cold rooms, and tunnels.",
+      "zh": "防水、防尘、防腐 LED 三防灯。适用于停车场、车间、冷库和隧道等场所。",
+      "es": "Luz LED tri-proof resistente al agua, al polvo y a la corrosión. Ideal para garajes, talleres, cámaras frigoríficas y túneles."
+    },
+    "specs": {
+      "en": {
+        "Power": "50W",
+        "Lumens": "7,500 lm",
+        "Efficacy": "150 lm/W",
+        "Color Temp": "4000K / 6500K",
+        "Input Voltage": "AC100-277V",
+        "Lifespan": "50,000+ hours",
+        "CRI": "Ra>80",
+        "IP Rating": "IP66",
+        "Material": "PC + Aluminum",
+        "Weight": "2.8 lbs"
+      },
+      "zh": {
+        "功率": "50W",
+        "光通量": "7500 lm",
+        "光效": "150 lm/W",
+        "色温": "4000K / 6500K",
+        "输入电压": "AC100-277V",
+        "寿命": "50000+ 小时",
+        "显色指数": "Ra>80",
+        "防护等级": "IP66",
+        "材质": "PC + 铝合金",
+        "重量": "2.8 磅"
+      },
+      "es": {
+        "Potencia": "50W",
+        "Lúmenes": "7,500 lm",
+        "Eficacia": "150 lm/W",
+        "Temp. Color": "4000K / 6500K",
+        "Voltaje de Entrada": "AC100-277V",
+        "Vida Útil": "50,000+ horas",
+        "IRC": "Ra>80",
+        "Clasificación IP": "IP66",
+        "Material": "PC + Aluminio",
+        "Peso": "2.8 libras"
+      }
+    },
+    "features": {
+      "en": [
+        "IP66 waterproof, dustproof, and corrosion resistant",
+        "PC + aluminum body for durability",
+        "Integrated design, easy installation",
+        "Suitable for wet and harsh environments",
+        "Energy saving up to 70% vs fluorescent",
+        "CE, RoHS certified"
+      ],
+      "zh": [
+        "IP66 防水、防尘、防腐",
+        "PC + 铝合金外壳，坚固耐用",
+        "一体化设计，安装简便",
+        "适用于潮湿和恶劣环境",
+        "比荧光灯节能高达 70%",
+        "CE, RoHS 认证"
+      ],
+      "es": [
+        "IP66 resistente al agua, polvo y corrosión",
+        "Cuerpo de PC + aluminio para durabilidad",
+        "Diseño integrado, fácil instalación",
+        "Adecuado para entornos húmedos y hostiles",
+        "Ahorro de energía hasta 70% vs fluorescente",
+        "Certificado CE, RoHS"
+      ]
+    }
+  },
+  {
+    "id": "e-003",
+    "slug": "120w-led-street-light",
+    "name": {
+      "en": "120W LED Street Light",
+      "zh": "120W LED 路灯",
+      "es": "Farola LED 120W"
+    },
+    "category": "energy",
+    "image": "",
+    "images": [],
+    "description": {
+      "en": "High-performance 120W LED street light with excellent uniform illumination. Designed for municipal road lighting, residential areas, and parking lots.",
+      "zh": "高性能 120W LED 路灯，具有优秀的均匀照明效果。适用于市政道路照明、住宅区和停车场。",
+      "es": "Farola LED de alto rendimiento de 120W con excelente iluminación uniforme. Diseñada para alumbrado público municipal, zonas residenciales y aparcamientos."
+    },
+    "specs": {
+      "en": {
+        "Power": "120W",
+        "Lumens": "18,000 lm",
+        "Efficacy": "150 lm/W",
+        "Color Temp": "3000K / 4000K / 5700K",
+        "Input Voltage": "AC100-277V",
+        "Lifespan": "50,000+ hours",
+        "CRI": "Ra>70",
+        "IP Rating": "IP66",
+        "Beam Angle": "70°x140°",
+        "Weight": "5.5 lbs"
+      },
+      "zh": {
+        "功率": "120W",
+        "光通量": "18000 lm",
+        "光效": "150 lm/W",
+        "色温": "3000K / 4000K / 5700K",
+        "输入电压": "AC100-277V",
+        "寿命": "50000+ 小时",
+        "显色指数": "Ra>70",
+        "防护等级": "IP66",
+        "光束角": "70°x140°",
+        "重量": "5.5 磅"
+      },
+      "es": {
+        "Potencia": "120W",
+        "Lúmenes": "18,000 lm",
+        "Eficacia": "150 lm/W",
+        "Temp. Color": "3000K / 4000K / 5700K",
+        "Voltaje de Entrada": "AC100-277V",
+        "Vida Útil": "50,000+ horas",
+        "IRC": "Ra>70",
+        "Clasificación IP": "IP66",
+        "Ángulo de Haz": "70°x140°",
+        "Peso": "5.5 libras"
+      }
+    },
+    "features": {
+      "en": [
+        "Replaces 250W traditional street lights",
+        "Tool-less maintenance design",
+        "Photocell sensor compatible",
+        "Type II/III roadway distribution",
+        "Surge protection: 10kV",
+        "5-year warranty"
+      ],
+      "zh": [
+        "替代 250W 传统路灯",
+        "免工具维护设计",
+        "兼容光控传感器",
+        "Type II/III 道路配光",
+        "浪涌保护：10kV",
+        "5 年质保"
+      ],
+      "es": [
+        "Reemplaza farolas tradicionales de 250W",
+        "Diseño de mantenimiento sin herramientas",
+        "Compatible con sensor fotoeléctrico",
+        "Distribución vial Tipo II/III",
+        "Protección contra sobretensiones: 10kV",
+        "Garantía de 5 años"
+      ]
+    }
+  },
+  {
+    "id": "e-004",
+    "slug": "30w-led-panel-light",
+    "name": {
+      "en": "30W LED Panel Light (Ultra-Slim)",
+      "zh": "30W LED 超薄面板灯",
+      "es": "Panel LED Ultra Delgado 30W"
+    },
+    "category": "energy",
+    "image": "",
+    "images": [],
+    "description": {
+      "en": "Ultra-slim 30W LED panel light for office and commercial lighting. Features edge-lit technology for uniform brightness and modern design.",
+      "zh": "超薄 30W LED 面板灯，适用于办公室和商业照明。采用侧发光技术，亮度均匀，设计现代。",
+      "es": "Panel LED ultra delgado de 30W para iluminación de oficinas y comercial. Cuenta con tecnología de iluminación lateral para brillo uniforme y diseño moderno."
+    },
+    "specs": {
+      "en": {
+        "Power": "30W",
+        "Lumens": "3,600 lm",
+        "Efficacy": "120 lm/W",
+        "Color Temp": "3000K / 4000K / 6500K",
+        "Input Voltage": "AC100-277V",
+        "Lifespan": "40,000+ hours",
+        "CRI": "Ra>90",
+        "Size": "595x595x10mm",
+        "Material": "Aluminum + PMMA",
+        "Weight": "3.3 lbs"
+      },
+      "zh": {
+        "功率": "30W",
+        "光通量": "3600 lm",
+        "光效": "120 lm/W",
+        "色温": "3000K / 4000K / 6500K",
+        "输入电压": "AC100-277V",
+        "寿命": "40000+ 小时",
+        "显色指数": "Ra>90",
+        "尺寸": "595x595x10mm",
+        "材质": "铝合金 + PMMA",
+        "重量": "3.3 磅"
+      },
+      "es": {
+        "Potencia": "30W",
+        "Lúmenes": "3,600 lm",
+        "Eficacia": "120 lm/W",
+        "Temp. Color": "3000K / 4000K / 6500K",
+        "Voltaje de Entrada": "AC100-277V",
+        "Vida Útil": "40,000+ horas",
+        "IRC": "Ra>90",
+        "Tamaño": "595x595x10mm",
+        "Material": "Aluminio + PMMA",
+        "Peso": "3.3 libras"
+      }
+    },
+    "features": {
+      "en": [
+        "Ultra-slim 10mm thickness - flush mount",
+        "Edge-lit technology for uniform illumination",
+        "High CRI >90 for true color rendering",
+        "Flicker-free driver for eye comfort",
+        "Suitable for offices, hospitals, schools",
+        "DALI dimming option available"
+      ],
+      "zh": [
+        "超薄 10mm 厚度，可嵌入安装",
+        "侧发光技术，照明均匀",
+        "高显指 CRI >90，色彩真实",
+        "无频闪电源，护眼舒适",
+        "适用于办公室、医院、学校",
+        "可选 DALI 调光"
+      ],
+      "es": [
+        "Ultra delgado de 10mm de espesor - montaje empotrado",
+        "Tecnología de iluminación lateral para iluminación uniforme",
+        "Alto IRC >90 para reproducción cromática fiel",
+        "Driver sin parpadeo para confort visual",
+        "Adecuado para oficinas, hospitales, escuelas",
+        "Opción de regulación DALI disponible"
+      ]
+    }
+  }
+]

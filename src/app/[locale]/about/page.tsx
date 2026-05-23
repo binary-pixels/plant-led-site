@@ -1,11 +1,15 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { useSettings } from '@/lib/settings-context';
 import { useChat } from '@/components/chat/chat-widget';
 
 export default function AboutPage() {
+  const locale = useLocale();
+  const { settings } = useSettings();
   const t = useTranslations('about');
   const ct = useTranslations('chat');
+  const about = settings?.about?.[locale] ?? settings?.about?.en ?? { subtitle: '', desc1: '', desc2: '' };
   const { open } = useChat();
 
   return (
@@ -15,14 +19,14 @@ export default function AboutPage() {
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
           {t('title')}
         </h1>
-        <p className="mt-2 text-lg text-gray-600">{t('subtitle')}</p>
+        <p className="mt-2 text-lg text-gray-600">{about.subtitle}</p>
         <div className="mt-2 w-16 h-1 bg-purple-600 rounded mx-auto" />
       </div>
 
       {/* Story */}
       <div className="max-w-3xl mx-auto space-y-6 text-gray-600 leading-relaxed">
-        <p>{t('desc1')}</p>
-        <p>{t('desc2')}</p>
+        <p>{about.desc1}</p>
+        <p>{about.desc2}</p>
       </div>
 
       {/* Values */}

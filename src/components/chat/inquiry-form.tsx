@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod/v4';
-import { products } from '@/lib/products';
+import { useProducts } from '@/lib/products-context';
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
 import { useChat } from './chat-context';
@@ -23,6 +23,7 @@ export default function InquiryForm() {
   const t = useTranslations('chat');
   const locale = useLocale();
   const { close } = useChat();
+  const { products } = useProducts();
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
   const {

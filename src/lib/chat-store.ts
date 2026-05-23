@@ -1,12 +1,91 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { translateToLanguages, getSupportedLocales } from './translate';
+import { promises as fs } from 'fs';
+import path from 'path';
+
+// ---- File persistence (used when Supabase is not configured) ----
+// Data survives server restarts via JSON files in src/data/chat/
+
+const DATA_DIR = path.join(process.cwd(), 'src', 'data', 'chat');
+const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
+const MESSAGES_DIR = path.join(DATA_DIR, 'messages');
+
+async function ensureDataDir(): Promise<void> {
+  try {
+    await fs.mkdir(MESSAGES_DIR, { recursive: true });
+  } catch {
+    // directory already exists
+  }
+}
+
+async function loadSessionsFromDisk(): Promise<Map<string, any>> {
+  const map = new Map<string, any>();
+  try {
+    const data = await fs.readFile(SESSIONS_FILE, 'utf-8');
+    const arr = JSON.parse(data);
+    for (const item of arr) {
+      map.set(item.id, item);
+    }
+  } catch {
+    // File doesn't exist yet
+  }
+  return map;
+}
+
+async function saveSessionsToDisk(sessions: Map<string, any>): Promise<void> {
+  await ensureDataDir();
+  const arr = Array.from(sessions.values());
+  await fs.writeFile(SESSIONS_FILE, JSON.stringify(arr, null, 2), 'utf-8');
+}
+
+async function loadMessagesFromDisk(sessionId: string): Promise<any[]> {
+  try {
+    const data = await fs.readFile(path.join(MESSAGES_DIR, `${sessionId}.json`), 'utf-8');
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+async function saveMessagesToDisk(sessionId: string, messages: any[]): Promise<void> {
+  await ensureDataDir();
+  await fs.writeFile(
+    path.join(MESSAGES_DIR, `${sessionId}.json`),
+    JSON.stringify(messages, null, 2),
+    'utf-8'
+  );
+}
 
 // ---- In-memory fallback (used when Supabase is not configured) ----
 
-const memSessions = new Map<string, any>();
-const memMessages = new Map<string, any[]>();
-const memCustomers = new Map<string, any>();
+const memSessions: Map<string, any> = new Map();
+const memMessages: Map<string, any[]> = new Map();
+const memCustomers: Map<string, any> = new Map();
 let memIdCounter = 0;
+let memLoaded = false;
+
+async function ensureMemLoaded(): Promise<void> {
+  if (memLoaded) return;
+  memLoaded = true;
+  try {
+    const diskSessions = await loadSessionsFromDisk();
+    for (const [id, session] of diskSessions) {
+      memSessions.set(id, session);
+      const msgs = await loadMessagesFromDisk(id);
+      memMessages.set(id, msgs);
+      if (session.customer_id) {
+        memCustomers.set(session.customer_id, {
+          id: session.customer_id,
+          email: session.customer_email || null,
+          name: session.customer_name,
+          last_locale: session.customer_last_locale,
+        });
+      }
+    }
+  } catch {
+    // Failed to load from disk; start fresh
+  }
+}
 
 function genId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${++memIdCounter}`;
@@ -66,11 +145,12 @@ function toSession(row: any, messages: ChatMessage[] = []): ChatSession {
 
 // ---- In-memory fallback implementation ----
 
-function createSessionMem(
+async function createSessionMem(
   customerLocale: string,
   customerName: string,
   customerEmail: string
-): ChatSession {
+): Promise<ChatSession> {
+  await ensureMemLoaded();
   const customerId = genId();
   const sessionId = genId();
   const now = Date.now();
@@ -97,17 +177,23 @@ function createSessionMem(
   memSessions.set(sessionId, session);
   memMessages.set(sessionId, []);
 
+  // Persist to disk
+  await saveSessionsToDisk(memSessions);
+  await saveMessagesToDisk(sessionId, []);
+
   return toSession(session, []);
 }
 
-function getMemSession(sessionId: string): ChatSession | null {
+async function getMemSession(sessionId: string): Promise<ChatSession | null> {
+  await ensureMemLoaded();
   const row = memSessions.get(sessionId);
   if (!row) return null;
   const msgs = memMessages.get(sessionId) || [];
   return toSession(row, msgs.map((m: any) => toMessage(m)));
 }
 
-function getAllMemSessions(): ChatSession[] {
+async function getAllMemSessions(): Promise<ChatSession[]> {
+  await ensureMemLoaded();
   const rows = Array.from(memSessions.values());
   rows.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
   return rows.map((row: any) => {
@@ -116,13 +202,14 @@ function getAllMemSessions(): ChatSession[] {
   });
 }
 
-function addMessageMem(
+async function addMessageMem(
   sessionId: string,
   role: 'customer' | 'agent',
   text: string,
   locale: string,
   imageUrl?: string | null
-): ChatMessage | null {
+): Promise<ChatMessage | null> {
+  await ensureMemLoaded();
   const session = memSessions.get(sessionId);
   if (!session) return null;
 
@@ -143,10 +230,15 @@ function addMessageMem(
 
   session.updated_at = new Date().toISOString();
 
+  // Persist to disk
+  await saveSessionsToDisk(memSessions);
+  await saveMessagesToDisk(sessionId, msgs);
+
   return toMessage(msg);
 }
 
-function getMessagesMem(sessionId: string, since?: number): ChatMessage[] {
+async function getMessagesMem(sessionId: string, since?: number): Promise<ChatMessage[]> {
+  await ensureMemLoaded();
   const msgs = memMessages.get(sessionId) || [];
   let filtered = msgs;
   if (since) {
@@ -156,7 +248,8 @@ function getMessagesMem(sessionId: string, since?: number): ChatMessage[] {
   return filtered.map((m: any) => ({ ...toMessage(m), translations: {} }));
 }
 
-function getSessionsByEmailMem(email: string): ChatSession[] {
+async function getSessionsByEmailMem(email: string): Promise<ChatSession[]> {
+  await ensureMemLoaded();
   const customerIds = new Set<string>();
   for (const [id, c] of memCustomers) {
     if (c.email === email) customerIds.add(id);
@@ -174,10 +267,12 @@ function getSessionsByEmailMem(email: string): ChatSession[] {
   return sessions;
 }
 
-function assignAgentMem(sessionId: string, agentId: string): boolean {
+async function assignAgentMem(sessionId: string, agentId: string): Promise<boolean> {
+  await ensureMemLoaded();
   const session = memSessions.get(sessionId);
   if (!session) return false;
   session.assigned_agent_id = agentId;
+  await saveSessionsToDisk(memSessions);
   return true;
 }
 
@@ -189,7 +284,7 @@ export async function createSession(
   customerEmail: string
 ): Promise<ChatSession> {
   if (!isSupabaseConfigured) {
-    return createSessionMem(customerLocale, customerName, customerEmail);
+    return await createSessionMem(customerLocale, customerName, customerEmail);
   }
 
   // Upsert customer
@@ -233,7 +328,7 @@ export async function createSession(
 }
 
 export async function getSession(sessionId: string): Promise<ChatSession | null> {
-  if (!isSupabaseConfigured) return getMemSession(sessionId);
+  if (!isSupabaseConfigured) return await getMemSession(sessionId);
 
   const { data: session } = await supabase
     .from('sessions')
@@ -259,7 +354,7 @@ export async function getSession(sessionId: string): Promise<ChatSession | null>
 }
 
 export async function getAllSessions(): Promise<ChatSession[]> {
-  if (!isSupabaseConfigured) return getAllMemSessions();
+  if (!isSupabaseConfigured) return await getAllMemSessions();
 
   const { data: rows } = await supabase
     .from('sessions')
@@ -299,7 +394,7 @@ export async function addMessage(
   locale: string,
   imageUrl?: string | null
 ): Promise<ChatMessage | null> {
-  if (!isSupabaseConfigured) return addMessageMem(sessionId, role, text, locale, imageUrl);
+  if (!isSupabaseConfigured) return await addMessageMem(sessionId, role, text, locale, imageUrl);
 
   // Insert the message
   const { data: msg, error } = await supabase
@@ -364,7 +459,7 @@ export async function getMessages(
   sessionId: string,
   since?: number
 ): Promise<ChatMessage[]> {
-  if (!isSupabaseConfigured) return getMessagesMem(sessionId, since);
+  if (!isSupabaseConfigured) return await getMessagesMem(sessionId, since);
 
   let query = supabase
     .from('messages')
@@ -405,7 +500,7 @@ export async function getMessages(
 // ---- Customer history ----
 
 export async function getSessionsByEmail(email: string): Promise<ChatSession[]> {
-  if (!isSupabaseConfigured) return getSessionsByEmailMem(email);
+  if (!isSupabaseConfigured) return await getSessionsByEmailMem(email);
 
   const { data: customers } = await supabase
     .from('customers')
@@ -451,7 +546,7 @@ export async function assignAgent(
   sessionId: string,
   agentId: string
 ): Promise<boolean> {
-  if (!isSupabaseConfigured) return assignAgentMem(sessionId, agentId);
+  if (!isSupabaseConfigured) return await assignAgentMem(sessionId, agentId);
 
   const { error } = await supabase
     .from('sessions')

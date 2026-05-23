@@ -6,22 +6,66 @@ import type { ChatMessage, ChatSession } from '@/lib/chat-store';
 
 const POLL_INTERVAL = 3000; // 3 seconds
 
+function isAudioUrl(url: string): boolean {
+  return /\.(webm|mp3|wav|ogg|m4a)$/i.test(url);
+}
+
 export default function TranslatedChat({ onClose }: { onClose: () => void }) {
   const locale = useLocale();
   const t = useTranslations('chat');
-  const [sessionId, setSessionId] = useState<string | null>(null);
+
+  // Restore session from sessionStorage so state survives dialog close/reopen
+  const [sessionId, setSessionId] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? sessionStorage.getItem('chat_sessionId') : null
+  );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [step, setStep] = useState<'form' | 'history' | 'chat'>('form');
+  const [name, setName] = useState(() =>
+    typeof window !== 'undefined' ? sessionStorage.getItem('chat_name') || '' : ''
+  );
+  const [email, setEmail] = useState(() =>
+    typeof window !== 'undefined' ? sessionStorage.getItem('chat_email') || '' : ''
+  );
+  const [emailError, setEmailError] = useState('');
+  const [step, setStep] = useState<'form' | 'history' | 'chat'>(() =>
+    typeof window !== 'undefined' && sessionStorage.getItem('chat_sessionId') ? 'chat' : 'form'
+  );
   const [previousSessions, setPreviousSessions] = useState<ChatSession[]>([]);
   const [viewingHistory, setViewingHistory] = useState<ChatSession | null>(null);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [recordingError, setRecordingError] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  // On mount: if restoring a session, fetch messages and start polling
+  useEffect(() => {
+    if (sessionId) {
+      fetchMessages(sessionId).then((msgs) => {
+        if (msgs) setMessages(msgs);
+      });
+      pollingRef.current = setInterval(async () => {
+        const msgs = await fetchMessages(sessionId);
+        if (msgs) setMessages(msgs);
+      }, POLL_INTERVAL);
+    }
+    // Cleanup on unmount
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Scroll to bottom
   const scrollToBottom = useCallback(() => {
@@ -32,26 +76,32 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  // Cleanup polling on unmount
-  useEffect(() => {
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, []);
+  function isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
 
   // Start session after form submit
   async function startSession() {
+    // Validate email
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      return;
+    }
+    if (!isValidEmail(email.trim())) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    setEmailError('');
+
     try {
       // Check for previous sessions by email
-      if (email) {
-        const historyRes = await fetch(`/api/chat/customer?email=${encodeURIComponent(email)}`);
-        if (historyRes.ok) {
-          const historyData = await historyRes.json();
-          if (historyData.sessions && historyData.sessions.length > 0) {
-            setPreviousSessions(historyData.sessions);
-            setStep('history');
-            return;
-          }
+      const historyRes = await fetch(`/api/chat/customer?email=${encodeURIComponent(email.trim())}`);
+      if (historyRes.ok) {
+        const historyData = await historyRes.json();
+        if (historyData.sessions && historyData.sessions.length > 0) {
+          setPreviousSessions(historyData.sessions);
+          setStep('history');
+          return;
         }
       }
 
@@ -68,13 +118,18 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           locale,
-          name: name || 'Visitor',
-          email: email || '',
+          name: name.trim() || email.split('@')[0],
+          email: email.trim(),
         }),
       });
       const data = await res.json();
       setSessionId(data.sessionId);
       setStep('chat');
+
+      // Persist session across dialog close/reopen
+      sessionStorage.setItem('chat_sessionId', data.sessionId);
+      sessionStorage.setItem('chat_name', name.trim() || email.split('@')[0]);
+      sessionStorage.setItem('chat_email', email.trim());
 
       // Poll for new messages
       pollingRef.current = setInterval(async () => {
@@ -151,6 +206,82 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
     e.target.value = '';
   }
 
+  // ---- Voice Recording ----
+
+  async function startRecording() {
+    try {
+      setRecordingError('');
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      const chunks: Blob[] = [];
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+        if (recordingTimerRef.current) {
+          clearInterval(recordingTimerRef.current);
+          recordingTimerRef.current = null;
+        }
+        setRecordingTime(0);
+
+        setUploading(true);
+        const mimeType = recorder.mimeType || 'audio/webm';
+        const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
+        const blob = new Blob(chunks, { type: mimeType });
+        const file = new File([blob], `voice.${ext}`, { type: mimeType });
+
+        try {
+          const fd = new FormData();
+          fd.append('file', file);
+          const res = await fetch('/api/upload', { method: 'POST', body: fd });
+          const data = await res.json();
+          if (data.url) await sendMessage(data.url);
+        } catch {
+          // fallback
+        } finally {
+          setUploading(false);
+        }
+      };
+
+      recorder.start();
+      setRecording(true);
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingTime((t) => t + 1);
+      }, 1000);
+    } catch {
+      setRecordingError('Could not start recording. Please try again.');
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    setRecording(false);
+  }
+
+  function toggleRecording() {
+    if (recording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  }
+
+  function formatTime(seconds: number): string {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -192,13 +323,27 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
           />
           <input
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) setEmailError('');
+            }}
             placeholder={t('emailPlaceholder')}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 focus:ring-2 focus:ring-purple-500 outline-none"
+            className={`w-full px-4 py-2.5 border rounded-lg text-sm mb-1 focus:ring-2 focus:ring-purple-500 outline-none ${
+              emailError ? 'border-red-400' : 'border-gray-300'
+            }`}
           />
+          {emailError && (
+            <p className="text-red-500 text-xs mb-3 ml-1">{emailError}</p>
+          )}
+          {!emailError && (
+            <p className="text-gray-400 text-xs mb-3 ml-1">
+              A valid email is required so we can assist you better
+            </p>
+          )}
           <button
             onClick={startSession}
-            className="w-full py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+            disabled={!email.trim()}
+            className="w-full py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {t('button')}
           </button>
@@ -270,8 +415,16 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
                         ? 'bg-white text-gray-700'
                         : 'bg-purple-100 text-gray-800'
                     }`}>
-                      {msg.imageUrl && (
+                      {msg.imageUrl && !isAudioUrl(msg.imageUrl) && (
                         <img src={msg.imageUrl} alt="" className="max-w-full rounded-lg mb-1 max-h-32 object-cover" />
+                      )}
+                      {msg.imageUrl && isAudioUrl(msg.imageUrl) && (
+                        <div className="flex items-center gap-1 mb-1">
+                          <svg className="w-3 h-3 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                          </svg>
+                          <audio src={msg.imageUrl} controls preload="metadata" className="h-8 max-w-[140px] rounded" />
+                        </div>
                       )}
                       {msg.text?.trim() && <p>{msg.text}</p>}
                     </div>
@@ -322,12 +475,29 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
                     )}
 
                     {/* Image */}
-                    {msg.imageUrl && (
+                    {msg.imageUrl && !isAudioUrl(msg.imageUrl) && (
                       <img
                         src={msg.imageUrl}
                         alt=""
                         className="max-w-full rounded-lg mb-2 max-h-48 object-cover"
                       />
+                    )}
+
+                    {/* Voice message */}
+                    {msg.imageUrl && isAudioUrl(msg.imageUrl) && (
+                      <div className="mb-2">
+                        <div className="flex items-center gap-2">
+                          <svg className={`w-4 h-4 shrink-0 ${isAgent ? 'text-gray-400' : 'text-purple-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                          </svg>
+                          <audio
+                            src={msg.imageUrl}
+                            controls
+                            preload="metadata"
+                            className="h-9 max-w-[180px] rounded-lg"
+                          />
+                        </div>
+                      </div>
                     )}
 
                     {/* Original text */}
@@ -393,6 +563,28 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
                   className="hidden"
                   onChange={handleImageSelect}
                 />
+                {/* Voice recording button */}
+                <button
+                  onClick={toggleRecording}
+                  disabled={uploading || sending}
+                  className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
+                    recording
+                      ? 'bg-red-500 text-white animate-pulse'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                  title={recording ? 'Stop recording' : 'Record voice message'}
+                >
+                  {recording ? (
+                    <span className="flex items-center gap-1 text-xs font-medium px-1">
+                      <span className="w-2 h-2 bg-white rounded-full" />
+                      {formatTime(recordingTime)}
+                    </span>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                  )}
+                </button>
                 {/* Send button */}
                 <button
                   onClick={() => sendMessage()}
@@ -404,6 +596,9 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
                   </svg>
                 </button>
               </div>
+              {recordingError && (
+                <p className="text-red-500 text-xs mt-2">{recordingError}</p>
+              )}
             </div>
           </div>
         </>

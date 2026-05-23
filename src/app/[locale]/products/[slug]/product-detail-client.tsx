@@ -2,7 +2,8 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { type Product, getRelatedProducts } from '@/lib/products';
+import { type Product } from '@/lib/products';
+import { useProducts } from '@/lib/products-context';
 import { useChat } from '@/components/chat/chat-widget';
 import ProductCard from '@/components/products/product-card';
 import ProductImage from '@/components/products/product-image';
@@ -16,6 +17,7 @@ export default function ProductDetailClient({
   const ct = useTranslations('chat');
   const locale = useLocale();
   const { open } = useChat();
+  const { getRelatedProducts } = useProducts();
 
   const related = getRelatedProducts(product);
   const specs = product.specs[locale as keyof typeof product.specs] ?? {};

@@ -36,6 +36,16 @@ yarn-error.log*
 # vercel
 .vercel
 
+# runtime data (auto-generated)
+/src/data/chat/
+/src/data/settings.json
+
+# user-uploaded assets (but keep .gitkeep)
+/public/audio/*
+!/public/audio/.gitkeep
+/public/images/products/*
+!/public/images/products/.gitkeep
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
