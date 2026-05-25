@@ -673,7 +673,7 @@ export default function AdminChatPage() {
                   rows={2}
                   className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
                 />
-                <div className="flex gap-1.5 self-end">
+                <div className="flex gap-1.5 self-center">
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
