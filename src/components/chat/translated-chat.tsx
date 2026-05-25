@@ -326,7 +326,7 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !(e.nativeEvent as any).isComposing) {
       e.preventDefault();
       sendMessage();
     }
@@ -370,7 +370,7 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
               setEmail(e.target.value);
               if (emailError) setEmailError('');
             }}
-            onKeyDown={(e) => { if (e.key === 'Enter') startSession(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !(e.nativeEvent as any).isComposing) startSession(); }}
             placeholder={t('emailPlaceholder')}
             className={`w-full px-4 py-2.5 border rounded-lg text-sm mb-1 focus:ring-2 focus:ring-purple-500 outline-none ${
               emailError ? 'border-red-400' : 'border-gray-300'

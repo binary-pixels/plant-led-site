@@ -660,7 +660,7 @@ export default function AdminChatPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
+                    if (e.key === 'Enter' && !e.shiftKey && !(e.nativeEvent as any).isComposing) {
                       e.preventDefault();
                       sendAsAgent();
                     }
