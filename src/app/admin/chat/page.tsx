@@ -78,6 +78,8 @@ export default function AdminChatPage() {
   const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const prevSessionsRef = useRef<Map<string, number>>(new Map());
+  const composingRef = useRef(false);
+  const compositionEndRef = useRef(0);
 
   const activeSession = sessions.find((s) => s.id === activeSessionId);
 
@@ -660,11 +662,13 @@ export default function AdminChatPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey && !(e.nativeEvent as any).isComposing) {
+                    if (e.key === 'Enter' && !e.shiftKey && !composingRef.current && Date.now() - compositionEndRef.current > 100) {
                       e.preventDefault();
                       sendAsAgent();
                     }
                   }}
+                  onCompositionStart={() => { composingRef.current = true; }}
+                  onCompositionEnd={() => { composingRef.current = false; compositionEndRef.current = Date.now(); }}
                   placeholder={`Reply in English (will be auto-translated to ${localeNames[activeSession.customerLocale] || 'customer'})...`}
                   rows={2}
                   className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"

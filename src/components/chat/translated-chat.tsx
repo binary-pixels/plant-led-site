@@ -43,6 +43,8 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const composingRef = useRef(false);
+  const compositionEndRef = useRef(0);
 
   // On mount: if restoring a session, fetch messages and start polling
   useEffect(() => {
@@ -326,7 +328,7 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && !e.shiftKey && !(e.nativeEvent as any).isComposing) {
+    if (e.key === 'Enter' && !e.shiftKey && !composingRef.current && Date.now() - compositionEndRef.current > 100) {
       e.preventDefault();
       sendMessage();
     }
@@ -370,7 +372,9 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
               setEmail(e.target.value);
               if (emailError) setEmailError('');
             }}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !(e.nativeEvent as any).isComposing) startSession(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !composingRef.current && Date.now() - compositionEndRef.current > 100) startSession(); }}
+            onCompositionStart={() => { composingRef.current = true; }}
+            onCompositionEnd={() => { composingRef.current = false; compositionEndRef.current = Date.now(); }}
             placeholder={t('emailPlaceholder')}
             className={`w-full px-4 py-2.5 border rounded-lg text-sm mb-1 focus:ring-2 focus:ring-purple-500 outline-none ${
               emailError ? 'border-red-400' : 'border-gray-300'
@@ -576,6 +580,8 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onCompositionStart={() => { composingRef.current = true; }}
+                onCompositionEnd={() => { composingRef.current = false; compositionEndRef.current = Date.now(); }}
                 placeholder={t('messagePlaceholder')}
                 rows={1}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:ring-2 focus:ring-purple-500 outline-none"
