@@ -67,6 +67,23 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Heartbeat: ping server every 15s while chat is open to show online status
+  useEffect(() => {
+    if (!sessionId || step !== 'chat') return;
+    const heartbeat = async () => {
+      try {
+        await fetch('/api/chat/heartbeat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        });
+      } catch {}
+    };
+    heartbeat();
+    const interval = setInterval(heartbeat, 15000);
+    return () => clearInterval(interval);
+  }, [sessionId, step]);
+
   // Scroll to bottom
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -154,16 +171,25 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
   async function uploadImage(file: File): Promise<string | null> {
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      return data.url || null;
+      const base64 = await fileToBase64(file);
+      return `data:${file.type};base64,${base64}`;
     } catch {
       return null;
     } finally {
       setUploading(false);
     }
+  }
+
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   async function sendMessage(imageUrl?: string) {
@@ -172,6 +198,19 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
     setSending(true);
     const text = input.trim();
     setInput('');
+
+    // Optimistic: show message immediately
+    const optimistic: ChatMessage = {
+      id: `temp-${Date.now()}`,
+      sessionId,
+      role: 'customer',
+      text: text || ' ',
+      imageUrl: imageUrl || null,
+      locale,
+      translations: {},
+      createdAt: Date.now(),
+    };
+    setMessages((prev) => [...prev, optimistic]);
 
     try {
       await fetch('/api/chat/send', {
@@ -239,11 +278,9 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
         const file = new File([blob], `voice.${ext}`, { type: mimeType });
 
         try {
-          const fd = new FormData();
-          fd.append('file', file);
-          const res = await fetch('/api/upload', { method: 'POST', body: fd });
-          const data = await res.json();
-          if (data.url) await sendMessage(data.url);
+          const base64 = await fileToBase64(file);
+          const dataUrl = `data:${mimeType};base64,${base64}`;
+          await sendMessage(dataUrl);
         } catch {
           // fallback
         } finally {
@@ -254,7 +291,13 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
       recorder.start();
       setRecording(true);
       recordingTimerRef.current = setInterval(() => {
-        setRecordingTime((t) => t + 1);
+        setRecordingTime((t) => {
+          const next = t + 1;
+          if (next >= 60 && mediaRecorderRef.current?.state !== 'inactive') {
+            mediaRecorderRef.current!.stop();
+          }
+          return next;
+        });
       }, 1000);
     } catch {
       setRecordingError('Could not start recording. Please try again.');
@@ -327,6 +370,7 @@ export default function TranslatedChat({ onClose }: { onClose: () => void }) {
               setEmail(e.target.value);
               if (emailError) setEmailError('');
             }}
+            onKeyDown={(e) => { if (e.key === 'Enter') startSession(); }}
             placeholder={t('emailPlaceholder')}
             className={`w-full px-4 py-2.5 border rounded-lg text-sm mb-1 focus:ring-2 focus:ring-purple-500 outline-none ${
               emailError ? 'border-red-400' : 'border-gray-300'

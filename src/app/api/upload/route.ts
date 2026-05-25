@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 10 uploads/minute per IP
+    const ip = getClientIp(request);
+    if (!checkRateLimit(`upload:${ip}`, 10)) {
+      return NextResponse.json(
+        { error: 'Too many uploads. Slow down.' },
+        { status: 429 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
 

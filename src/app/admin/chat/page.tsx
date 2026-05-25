@@ -10,9 +10,43 @@ interface AgentInfo {
 }
 
 const POLL_INTERVAL = 2000;
+const ONLINE_THRESHOLD_MS = 30000; // 30 seconds
 
 function isAudioUrl(url: string): boolean {
   return /\.(webm|mp3|wav|ogg|m4a)$/i.test(url);
+}
+
+function playNotificationSound() {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.frequency.value = 660;
+    oscillator.type = 'sine';
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.4);
+    // Second tone
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.frequency.value = 880;
+    osc2.type = 'sine';
+    gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.1);
+    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    osc2.start(ctx.currentTime + 0.1);
+    osc2.stop(ctx.currentTime + 0.5);
+  } catch {
+    // Audio not supported
+  }
+}
+
+function isOnline(session: ChatSession): boolean {
+  return !!session.lastSeen && Date.now() - session.lastSeen < ONLINE_THRESHOLD_MS;
 }
 
 const localeNames: Record<string, string> = {
@@ -35,11 +69,15 @@ export default function AdminChatPage() {
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordingError, setRecordingError] = useState('');
   const [agent, setAgent] = useState<AgentInfo | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const prevSessionsRef = useRef<Map<string, number>>(new Map());
 
   const activeSession = sessions.find((s) => s.id === activeSessionId);
 
@@ -75,31 +113,58 @@ export default function AdminChatPage() {
   useEffect(() => {
     async function fetchSessions() {
       try {
-        const res = await fetch('/api/chat/session?sessionId=list');
+        const params = new URLSearchParams({ sessionId: 'list', page: String(page), limit: '50' });
+        if (searchQuery) params.set('search', searchQuery);
+        const res = await fetch(`/api/chat/session?${params}`);
         if (res.ok) {
           const data = await res.json();
-          setSessions(data.sessions || []);
+          const newSessions: ChatSession[] = data.sessions || [];
+          setSessions(newSessions);
+          setTotalPages(data.totalPages || 1);
+
+          // Check for new customer messages and play notification sound
+          for (const session of newSessions) {
+            const customerMsgs = session.messages.filter((m) => m.role === 'customer');
+            if (customerMsgs.length === 0) continue;
+            const prevCount = prevSessionsRef.current.get(session.id) ?? 0;
+            if (prevCount > 0 && customerMsgs.length > prevCount) {
+              // Only play if this session is not the currently active one
+              if (session.id !== activeSessionId) {
+                playNotificationSound();
+              }
+            }
+            prevSessionsRef.current.set(session.id, customerMsgs.length);
+          }
         }
       } catch {}
     }
     fetchSessions();
     const interval = setInterval(fetchSessions, POLL_INTERVAL);
     return () => clearInterval(interval);
-  }, []);
+  }, [page, searchQuery, activeSessionId]);
 
   async function uploadImage(file: File): Promise<string | null> {
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      return data.url || null;
+      const base64 = await fileToBase64(file);
+      return `data:${file.type};base64,${base64}`;
     } catch {
       return null;
     } finally {
       setUploading(false);
     }
+  }
+
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   // ---- Voice Recording ----
@@ -137,13 +202,9 @@ export default function AdminChatPage() {
         const file = new File([blob], `voice.${ext}`, { type: mimeType });
 
         try {
-          const formData = new FormData();
-          formData.append('file', file);
-          const res = await fetch('/api/upload', { method: 'POST', body: formData });
-          const data = await res.json();
-          if (data.url) {
-            await sendAsAgent(data.url);
-          }
+          const base64 = await fileToBase64(file);
+          const dataUrl = `data:${mimeType};base64,${base64}`;
+          await sendAsAgent(dataUrl);
         } catch {
           // fallback
         } finally {
@@ -154,7 +215,13 @@ export default function AdminChatPage() {
       recorder.start();
       setRecording(true);
       recordingTimerRef.current = setInterval(() => {
-        setRecordingTime((t) => t + 1);
+        setRecordingTime((t) => {
+          const next = t + 1;
+          if (next >= 60 && mediaRecorderRef.current?.state !== 'inactive') {
+            mediaRecorderRef.current!.stop();
+          }
+          return next;
+        });
       }, 1000);
     } catch (err) {
       setRecordingError(
@@ -207,10 +274,13 @@ export default function AdminChatPage() {
       }
 
       // Refresh
-      const listRes = await fetch('/api/chat/session?sessionId=list');
+      const params = new URLSearchParams({ sessionId: 'list', page: String(page), limit: '50' });
+      if (searchQuery) params.set('search', searchQuery);
+      const listRes = await fetch(`/api/chat/session?${params}`);
       if (listRes.ok) {
         const data = await listRes.json();
         setSessions(data.sessions || []);
+        setTotalPages(data.totalPages || 1);
       }
     } catch {
       setError('Failed to send message');
@@ -225,6 +295,21 @@ export default function AdminChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, agentId: agent.id }),
       });
+    } catch {}
+  }
+
+  async function exportChat() {
+    try {
+      const res = await fetch('/api/chat/session?sessionId=list&export=true');
+      if (!res.ok) return;
+      const data = await res.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chat-history-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch {}
   }
 
@@ -250,11 +335,28 @@ export default function AdminChatPage() {
     <div className="flex h-[calc(100vh-53px)]">
       {/* Session List */}
       <div className="w-72 lg:w-80 bg-white border-r border-gray-200 flex flex-col shrink-0">
-        <div className="p-4 border-b border-gray-200">
-          <h1 className="font-bold text-gray-900 text-lg">Chat Sessions</h1>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {sessions.length} session{sessions.length !== 1 ? 's' : ''}
-          </p>
+        <div className="p-4 border-b border-gray-200 space-y-2">
+          <div className="flex items-center justify-between">
+            <h1 className="font-bold text-gray-900 text-lg">Chat Sessions</h1>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-gray-400">
+                {totalPages > 1 ? `Page ${page}/${totalPages}` : ''}
+              </span>
+              <button
+                onClick={exportChat}
+                className="text-[10px] px-2 py-1 rounded bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                title="Export all chats as JSON"
+              >
+                ↓ Export
+              </button>
+            </div>
+          </div>
+          <input
+            value={searchQuery}
+            onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+            placeholder="Search by name or email..."
+            className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 outline-none"
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto">
@@ -287,9 +389,14 @@ export default function AdminChatPage() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-sm font-semibold text-gray-900 truncate">
-                      {session.customerEmail || session.customerName}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${
+                        isOnline(session) ? 'bg-green-500' : 'bg-gray-300'
+                      }`} title={isOnline(session) ? 'Online' : 'Offline'} />
+                      <span className="text-sm font-semibold text-gray-900 truncate">
+                        {session.customerEmail || session.customerName}
+                      </span>
+                    </div>
                     {unread > 0 && (
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">
                         {unread}
@@ -307,6 +414,11 @@ export default function AdminChatPage() {
                   <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
                     {session.customerLocale.toUpperCase()}
                   </span>
+                  {isOnline(session) && (
+                    <span className="text-[10px] font-medium text-green-600">
+                      Online
+                    </span>
+                  )}
                   {session.customerName && session.customerEmail && (
                     <span className="text-[10px] text-gray-400 truncate max-w-[100px]">
                       {session.customerName}
@@ -335,6 +447,27 @@ export default function AdminChatPage() {
             );
           })}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-2 border-t border-gray-200">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="text-xs px-3 py-1 rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Prev
+            </button>
+            <span className="text-[10px] text-gray-400">{page} / {totalPages}</span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="text-xs px-3 py-1 rounded bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Chat Area */}
@@ -355,6 +488,14 @@ export default function AdminChatPage() {
                   )}
                   <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">
                     {localeNames[activeSession.customerLocale] ?? activeSession.customerLocale}
+                  </span>
+                  <span className={`flex items-center gap-1 text-[10px] font-medium ${
+                    isOnline(activeSession) ? 'text-green-600' : 'text-gray-400'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      isOnline(activeSession) ? 'bg-green-500' : 'bg-gray-300'
+                    }`} />
+                    {isOnline(activeSession) ? 'Online' : 'Offline'}
                   </span>
                 </div>
                 {activeSession.customerEmail && (

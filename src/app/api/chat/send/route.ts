@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server';
 import { addMessage } from '@/lib/chat-store';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 30 requests/minute per IP
+    const ip = getClientIp(request);
+    if (!checkRateLimit(`chat-send:${ip}`, 30)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Slow down.' },
+        { status: 429 }
+      );
+    }
+
     const { sessionId, role, text, locale, imageUrl } = await request.json();
 
     if (!sessionId || !role || (!text && !imageUrl) || !locale) {

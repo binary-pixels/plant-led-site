@@ -3,6 +3,8 @@ import { translateToLanguages, getSupportedLocales } from './translate';
 import { promises as fs } from 'fs';
 import path from 'path';
 
+const MAX_MESSAGES_PER_SESSION = 500;
+
 // ---- File persistence (used when Supabase is not configured) ----
 // Data survives server restarts via JSON files in src/data/chat/
 
@@ -61,6 +63,8 @@ async function saveMessagesToDisk(sessionId: string, messages: any[]): Promise<v
 const memSessions: Map<string, any> = new Map();
 const memMessages: Map<string, any[]> = new Map();
 const memCustomers: Map<string, any> = new Map();
+// Heartbeat timestamps (works for both memory and Supabase — no schema change needed)
+const heartbeatMap: Map<string, number> = new Map();
 let memIdCounter = 0;
 let memLoaded = false;
 
@@ -112,6 +116,7 @@ export interface ChatSession {
   assignedAgentId?: string | null;
   status: 'open' | 'closed';
   lastActivity: number;
+  lastSeen?: number | null;
   messages: ChatMessage[];
 }
 
@@ -139,6 +144,7 @@ function toSession(row: any, messages: ChatMessage[] = []): ChatSession {
     assignedAgentId: row.assigned_agent_id,
     status: row.status,
     lastActivity: new Date(row.updated_at ?? row.created_at).getTime(),
+    lastSeen: heartbeatMap.get(row.id) ?? null,
     messages,
   };
 }
@@ -213,6 +219,9 @@ async function addMessageMem(
   const session = memSessions.get(sessionId);
   if (!session) return null;
 
+  const msgs = memMessages.get(sessionId) || [];
+  if (msgs.length >= MAX_MESSAGES_PER_SESSION) return null;
+
   const msg = {
     id: genId(),
     session_id: sessionId,
@@ -224,11 +233,15 @@ async function addMessageMem(
     created_at: new Date().toISOString(),
   };
 
-  const msgs = memMessages.get(sessionId) || [];
   msgs.push(msg);
   memMessages.set(sessionId, msgs);
 
   session.updated_at = new Date().toISOString();
+
+  // Track customer heartbeat for online status
+  if (role === 'customer') {
+    heartbeatMap.set(sessionId, Date.now());
+  }
 
   // Persist to disk
   await saveSessionsToDisk(memSessions);
@@ -274,6 +287,12 @@ async function assignAgentMem(sessionId: string, agentId: string): Promise<boole
   session.assigned_agent_id = agentId;
   await saveSessionsToDisk(memSessions);
   return true;
+}
+
+// ---- Heartbeat (online status) ----
+
+export async function updateSessionHeartbeat(sessionId: string): Promise<void> {
+  heartbeatMap.set(sessionId, Date.now());
 }
 
 // ---- Session API ----
@@ -396,6 +415,13 @@ export async function addMessage(
 ): Promise<ChatMessage | null> {
   if (!isSupabaseConfigured) return await addMessageMem(sessionId, role, text, locale, imageUrl);
 
+  // Check message limit
+  const { count } = await supabase
+    .from('messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('session_id', sessionId);
+  if (count && count >= MAX_MESSAGES_PER_SESSION) return null;
+
   // Insert the message
   const { data: msg, error } = await supabase
     .from('messages')
@@ -419,6 +445,11 @@ export async function addMessage(
     .from('sessions')
     .update({ updated_at: new Date().toISOString() })
     .eq('id', sessionId);
+
+  // Track customer heartbeat for online status
+  if (role === 'customer') {
+    heartbeatMap.set(sessionId, Date.now());
+  }
 
   // Translate to all supported languages (async, don't block)
   if (process.env.DEEPL_API_KEY) {
